@@ -59,7 +59,8 @@ class Group(Base):
 	__tablename__ = "group"
 	id = Column(Integer, primary_key=True)
 	name = Column(String(50), unique=True, nullable=False)
-	creater = Column(Integer, ForeignKey("Role.id"))
+	open_status = Column(Integer, nullable=False) # 0:all, 1:can search, 2:private
+	creater_id = Column(Integer, ForeignKey("Role.id"))
 	create_date = Column(Datetime, nullable=False)
 
 class GroupLink(Base):
@@ -81,6 +82,20 @@ class GroupJoiner(Base):
 	group_id = Column(Integer, ForeignKey("Group.id"))
 	joiner_id = Coumn(Integer, ForeignKey("Role.id"))
 	joiner_pass = Column(Integer, ForeignKey("Password.key"))
+
+class Input(Base):
+	__tablename__ = "input"
+	id = Column(Integer, primary_key=True)
+	# 0:one action, 1:long text, 2:short text, 3: comment, 4:pic, 5:video, 6:sound, 7:plan
+	type = Column(Integer, nullable=False)
+	create_id = Column(Integer, ForeignKey("Role.id"))
+	create_pass = Column(Integer, ForeignKey("Password.key"))
+	create_date = Column(Datetime, nullable=False)
+	group_id = Column(Integer, ForeignKey("Group.id"))
+
+class message(Base):
+	__tablename__ = "message"
+	id = Column(Integer, primary_key=True)
 
 class Permission(Base):
 	'''
