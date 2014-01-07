@@ -4,7 +4,7 @@ try:
 except ImportError:
 	import ipaddr as ipaddress
 
-from sqlalchemy import create_engine, Column, Integer, Boolean, String, Datetime, ForeignKey, UniqueConstraint
+from sqlalchemy import create_engine, func, Column, Integer, Boolean, String, Datetime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref, sessionmaker
 
 import sqlalchemy.ext.declarative
@@ -17,21 +17,31 @@ def db_init(*args, **kwargs):
 
 class Role(Base):
 	__tablename__ = "role"
+	__table_args__ = (UniqueConstraint("name","email"),)
 	id = Column(Integer, primary_key=True)
-	email = Column(String(100), unique=True)
-	name = Column(String(50), unique=True)
-	create_date = Column(Datetime, nullable=False)
+	name = Column(String(50), nullable=False, unique=True)
+	email = Column(String(100), nullable=False)
+	create_date = Column(Datetime, default=func.now())
 	
-	password = relationship("Password", cascade="all,delete-orphan", backref="role")
+	password = relationship("Password", cascade="all,delete-orphan")
 
 class Password(Base):
 	__tablename__ = "password"
-	id = Column(Integer, primary_key=True)
+	__table_args__ = (UniqueConstraint("role_id","key",)
 	role_id = Column(Integer, ForeignKey("Role.id"))
-	key = Column(String(12), nullable=False)
-	create_date = Column(Datetime, nullable=False)
-	status = Column(Integer, nullable=False) # 0:off, 1:on, 2:out
+	key = Column(String(20), nullable=False)
+	create_date = Column(Datetime, default=func.now())
+	status = Column(Integer, nullable=False) # login status. 0:off, 1:on, 2:out
 
+class Profile(Base):
+	__tablename__ = "profile"
+	__table_args__ = (UniqueConstraint("role_id","role_pass"),)
+	role_id = Column(Integer, ForeignKey("Role.id"))
+	role_pass = Column(Integer, ForeignKey("Password.key"))
+	gender = Column(Boolean)
+	locate = Column(String(100))
+
+# RoleLink is for one person.
 class RoleLink(Base):
 	__tablename__ = "role_link"
 	__table_args__ = (UniqueConstraint("up_role_id","up_role_pass","down_role_id","down_role_pass"),)
@@ -40,6 +50,7 @@ class RoleLink(Base):
 	down_role_id = Column(Integer, ForeignKey("Role.id"))
 	down_role_pass = Column(Integer, ForeignKey("Password.key"))
 
+# RoleFollow if for two persons.
 class RoleFollow(Base):
 	__tablename__ = "role_follow"
 	__table_args__ = (UniqueConstraint("up_role_id","up_role_pass","down_role_id","down_role_pass"),)
@@ -96,74 +107,4 @@ class Input(Base):
 class message(Base):
 	__tablename__ = "message"
 	id = Column(Integer, primary_key=True)
-
-class Permission(Base):
-	'''
-	bootstrap network has both mac or network_user_name to be null, and that 
-	row must be the only row in this table.
-	'''
-	__tablename__ = "permission"
-	__table_args__ = (UniqueConstraint("network_id","device_id","user_id"),)
-	id = Column(Integer, primary_key=True)
-	network_id = Column(Integer, ForeignKey("network.id"), nullable=False)
-	device_id = Column(Integer, ForeignKey("device.id")) # None means ANY
-	user_id = Column(Integer, ForeignKey("user.id")) # None means ANY
-	
-	def is_bootstrap(self):
-		return self.device_id == None and self.user_id == None
-
-class DatapathContainer(Base):
-	__tablename__ = "datapath_container"
-	id = Column(Integer, primary_key=True)
-	ip_address = Column(String, unique=True, nullable=False) # IPv4 or IPv6 address of the openflow switch housing
-	# binascii.b2a_hex(ipaddress.IPNetwork(ip_address).packed).
-	# This column was introduced to reduce the cost of IP address matching.
-	# The meaning of content itself is the same with ip_address, so theoretically, this column is not required.
-	ip_address_hex = Column(String, unique=True, nullable=False)
-	name = Column(String) # hostname
-	type = Column(String) # this setting determines how to submit custom commands that is out of scope of openflow.
-	
-	datapaths = relationship("Datapath", cascade="all,delete-orphan")
-	vlan_static = relationship("VlanStatic", cascade="all,delete-orphan", backref="container")
-	
-	@staticmethod
-	def find_by_ip_address(session, ip_address):
-		candidates = []
-		candidates.append(binascii.b2a_hex(ipaddress.IPNetwork(ip_address).packed))
-		if ip_address.find(".") > 0:
-			if ip_address.startswith("::ffff:"):
-				candidates.append(binascii.b2a_hex(ipaddress.IPNetwork(ip_address[len("::ffff:"):]).packed))
-			elif ip_address.startswith("::ffff:0:"):
-				candidates.append(binascii.b2a_hex(ipaddress.IPNetwork(ip_address[len("::ffff:0:"):]).packed))
-			
-			if ip_address.find(":") < 0:
-				candidates.append(binascii.b2a_hex(ipaddress.IPNetwork("::ffff:"+ip_address).packed))
-				candidates.append(binascii.b2a_hex(ipaddress.IPNetwork("::ffff:0:"+ip_address).packed))
-		
-		return session.query(DatapathContainer).filter(
-			DatapathContainer.ip_address_hex.in_(candidates)).first()
-
-class Datapath(Base):
-	__tablename__ = "datapath"
-	id = Column(Integer, primary_key=True)
-	datapath_hex = Column(String(16)) # openflow switch datapath_id in hex. Note this is nullable, meaning Datapath may be specified only by datapath_container
-	uplink = Column(String, nullable=False) # uplink port name or number on the datapath.
-	container_id = Column(Integer, ForeignKey("datapath_container.id")) # Note this is nullable, cascading does not happen on NULL
-
-class VlanStatic(Base):
-	'''
-	if you want to map a specific vlan to some network, then create an entry in this table.
-	'''
-	__tablename__ = "vlan_static"
-	__table_args__ = (UniqueConstraint("datapath_hex","container_id","network_id"), UniqueConstraint("datapath_hex","container_id","vlan"))
-	id = Column(Integer, primary_key=True)
-	datapath_hex = Column(String(16))
-	container_id = Column(Integer, ForeignKey("datapath_container.id"))
-	network_id = Column(Integer, ForeignKey("network.id"), nullable=False)
-	vlan = Column(Integer, nullable=False)
-
-class Config(Base):
-	__tablename__ = "config"
-	name = Column(String, primary_key=True)
-	value = Column(String)
 

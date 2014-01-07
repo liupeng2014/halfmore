@@ -1,0 +1,22 @@
+<html>
+<header>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>{% block title %}{% endblock %} - HalfMore</title>
+	{% block link %}{% endblock %}
+</header>
+<body>
+<div id="container" style="width:800px;">
+	<div id="header">
+	{% block header %}{% endblock %}
+	</div>
+	<div id="content">
+	{% block content %}{% endblock %}
+	</div>
+	<div id="footer" align="right">
+	{% block footer %}
+		<font size="2">copyright (c) HalfMore Inc. All right reserved.</font>
+	{% endblock %}
+	</div>
+</div>
+</body>
+</html>
