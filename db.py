@@ -28,43 +28,38 @@ class Role(Base):
 class Password(Base):
 	__tablename__ = "password"
 	__table_args__ = (UniqueConstraint("role_id","key",)
-	role_id = Column(Integer, ForeignKey("Role.id"))
+	id = Column(Integer, primary_key=True)
+	rid = Column(Integer, ForeignKey("Role.id"))
 	key = Column(String(20), nullable=False)
 	create_date = Column(Datetime, default=func.now())
 	status = Column(Integer, nullable=False) # login status. 0:off, 1:on, 2:out
+	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:secret, 2:friend, 3:group
 
 class Profile(Base):
 	__tablename__ = "profile"
-	__table_args__ = (UniqueConstraint("role_id","role_pass"),)
-	role_id = Column(Integer, ForeignKey("Role.id"))
-	role_pass = Column(Integer, ForeignKey("Password.key"))
+	rp = Column(Integer, ForeignKey("Password.id"))
 	gender = Column(Boolean)
 	locate = Column(String(100))
 
 # RoleLink is for one person.
 class RoleLink(Base):
 	__tablename__ = "role_link"
-	__table_args__ = (UniqueConstraint("up_role_id","up_role_pass","down_role_id","down_role_pass"),)
-	up_role_id = Column(Integer, ForeignKey("Role.id"))
-	up_role_pass = Column(Integer, ForeignKey("Password.key"))
-	down_role_id = Column(Integer, ForeignKey("Role.id"))
-	down_role_pass = Column(Integer, ForeignKey("Password.key"))
+	__table_args__ = (UniqueConstraint("out_rp", "in_rp"),)
+	out_rp = Column(Integer, ForeignKey("Password.id"))
+	in_rp = Column(Integer, ForeignKey("Password.id"))
 
 # RoleFollow if for two persons.
 class RoleFollow(Base):
 	__tablename__ = "role_follow"
-	__table_args__ = (UniqueConstraint("up_role_id","up_role_pass","down_role_id","down_role_pass"),)
-	up_role_id = Column(Integer, ForeignKey("Role.id"))
-	up_role_pass = Column(Integer, ForeignKey("Password.key"))
-	down_role_id = Column(Integer, ForeignKey("Role.id"))
-	down_role_pass = Column(Integer, ForeignKey("Password.key"))
+	__table_args__ = (UniqueConstraint("up_role", "down_rp"),)
+	up_role = Column(Integer, ForeignKey("Role.id"))
+	down_rp = Column(Integer, ForeignKey("Password.id"))
 
 class RoleBlock(Base):
 	__tablename__ = "role_block"
-	__table_args__ = (UniqueConstraint("up_role_id","up_role_pass","down_role_id","block_role_pass"),)
-	up_role_id = Column(Integer, ForeignKey("Role.id"))
-	up_role_pass = Column(Integer, ForeignKey("Password.key"))
-	block_role_id = Column(Integer, ForeignKey("Role.id"))
+	__table_args__ = (UniqueConstraint("rp", "block_role"),)
+	rp = Column(Integer, ForeignKey("Password.id"))
+	block_role = Column(Integer, ForeignKey("Role.id"))
 
 class Group(Base):
 	__tablename__ = "group"
