@@ -1,10 +1,6 @@
 # coding: utf-8
 
-import re, binascii, socket, json, sha
-try:
-	import ipaddress
-except ImportError:
-	import ipaddr as ipaddress
+import re, binascii, socket, sha
 
 from flask import flash
 from flask.ext.wtf import Form
@@ -36,16 +32,16 @@ class LoginForm(Form):
 		role = dbsession.query(db.Role)\
 			.filter(db.Role.name==self.rolename.data).first()
 		if not role:
-			self.username.data = ""
-			flash(u"Wrong role or password")
+			self.rolename.data = ""
+			flash(u"Wrong rolename or password")
 
 		encpass = sha.new(self.password.data).hexdigest()
 		rp = dbsession.query(config.Password)\
 			.filter(db.Password.rid==role.id).\
 			.filter(db.Password.key==encpass).first()
 		if not rp:
-			flash(u'Wrong username or password.')
-			self.username.data = ""
+			flash(u'Wrong rolename or password.')
+			self.rolename.data = ""
 			return False
 
 		return rp
@@ -59,8 +55,8 @@ class RoleRegisterForm(Form):
 
 	def __init__(self, *args, **kwargs):
 		super(RoleRegisterForm, self).__init__(*args, **kwargs)
-		self.network.choices.insert([(0, (0, 'All')), (1, (1, 'Secret')),
-									 (2, (2, 'Friend')), (3, (3, 'Group'))])
+		self.openflag.choices.insert([(0, (0, 'All')), (1, (1, 'Secret')),
+									  (2, (2, 'Friend')), (3, (3, 'Group'))])
 
 	def validate(self):
 		if not self.rolename.data:
@@ -112,11 +108,11 @@ class RoleRegisterForm(Form):
 
 		return True
 
-	def registerUser(self):
-		user = config.User()
-		user.password = sha.new(self.password.data).hexdigest()
-		user.name = self.username.data
-		user.is_admin = self.userlevel.data
+	def registerRole(self):
+		role = config.Role()
+		role.password = sha.new(self.password.data).hexdigest()
+		role.name = self.username.data
+		role.is_admin = self.userlevel.data
 		try:
 			dbsession.add(user)
 			dbsession.flush()
