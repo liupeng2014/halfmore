@@ -1,8 +1,11 @@
 <html>
 <header>
+	{% block head %}
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<link rel="stylesheet" type="text/css" href="../static/css/common.css">
 	<title>{% block title %}{% endblock %} - HalfMore</title>
 	{% block link %}{% endblock %}
+	{% endblock %}
 </header>
 <body>
 <div id="container" style="width:800px;">

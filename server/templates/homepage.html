@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Homepage{% endblock %}
+{% block width %}600{% endblock %}
+{% block height %}50{% endblock %}
+{% block header %}
+		<table bgcolor="#00BFFF">
+			<tr valign="bottom">
+				<td width="150" valign="top" align="left">
+					LOGO
+				</td>
+				<td width="350" align="center">
+					<font size="5">Homepage</font>
+				</td>
+				<td width="100" align="center">
+					<input type="button" name="logout" onclick="location.href='/logout'" value="logout" class="navibtn"/>
+				</td>
+			</tr>
+		</table>
+{% endblock %}
+{% block content %}
+		<table bgcolor="#00BFFF">
+			<tr>
+				<td colspan="5" height="30"></td>
+			</tr>
+			<tr>
+				<td width="45" height="20">
+				</td>
+				<td width="250" height="20" bgcolor="#FFFF00" align="center">
+					{% if session.role == 1 %}
+					<a href="/user_register">ユーザ登録</a>
+					{% else %}
+					<a href="/user_update">パスワード更新</a>
+					{% endif %}
+				</td>
+				<td width="10" height="20">
+				</td>
+				<td width="250" height="20" bgcolor="#FFFF00" align="center">
+					{% if session.role == 1 %}
+					<a href="/user_list">ユーザ参照</a>
+					{% else %}
+					<a href="/device_list">デバイス参照</a>
+					{% endif %}
+				</td>
+				<td width="45" height="20">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" height="10"></td>
+			</tr>
+		</table>
+{% endblock %}

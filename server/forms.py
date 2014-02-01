@@ -10,7 +10,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, func, exc
 from sqlalchemy.orm import sessionmaker
 
-from . import db, dbsession
+from server import db, dbsession
 
 
 class LoginForm(Form):
@@ -33,14 +33,14 @@ class LoginForm(Form):
 			.filter(db.Role.name==self.rolename.data).first()
 		if not role:
 			self.rolename.data = ""
-			flash(u"Wrong rolename or password")
+			flash(u"Wrong rolename")
 
 		encpass = sha.new(self.password.data).hexdigest()
-		rp = dbsession.query(config.Password)\
-			.filter(db.Password.rid==role.id).\
-			.filter(db.Password.key==encpass).first()
+		rp = dbsession.query(db.Password)\
+			.filter(db.Password.rid == role.id)\
+			.filter(db.Password.key == encpass).first()
 		if not rp:
-			flash(u'Wrong rolename or password.')
+			flash(u'Wrong password.')
 			self.rolename.data = ""
 			return False
 
@@ -128,7 +128,7 @@ class RoleRegisterForm(Form):
 
 	def updateUser(self):
 		user = dbsession.query(config.User)\
-			.filter(config.User.id==self.userid).first()
+			.filter(db.User.id==self.userid).first()
 		if not user:
 			flash(u'User does not exist.')
 			return False

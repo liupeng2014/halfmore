@@ -1,15 +1,11 @@
 # coding: utf-8
 
-import sys, os
+import sys, os, sha
 import binascii
 import ConfigParser
-try:
-	import ipaddress
-except ImportError:
-	import ipaddr as ipaddress
 
 from flask import Flask
-from . import db
+from server import db
 import logging
 from logging import FileHandler, Formatter
 from sqlalchemy import exc, create_engine
@@ -32,12 +28,10 @@ logger = logging.getLogger('OmniWebLog')
 logger.addHandler(logfile_handler)
 logger.setLevel(logging.DEBUG)
 
-dbsession = db.db_init(cfg.get('config', 'url')+'?check_same_thread=False')
-db_insert_default(dbsession)
-
 def db_insert_default(session):
-	if not session.query(db.Role)\
-		.filter(db.Role.name == 'liupeng').first():
+	r1 = session.query(db.Role)\
+		.filter(db.Role.name == 'liupeng').first()
+	if r1 is None:
 		r1 = db.Role()
 		r1.name = 'liupeng'
 		r1.email = 'liupeng@gmail.com'
@@ -51,7 +45,7 @@ def db_insert_default(session):
 
 		r1p1 = db.Password()
 		r1p1.rid = r1.id
-		r1p1.key = 'lp'
+		r1p1.key = sha.new('lp').hexdigest()
 		try:
 			session.add(r1p1)
 			session.commit()
@@ -75,7 +69,7 @@ def db_insert_default(session):
 
 		r2p1 = db.Password()
 		r2p1.rid = r2.id
-		r2p1.key = 'lpc'
+		r2p1.key = sha.new('lpc').hexdigest()
 		try:
 			session.add(r2p1)
 			session.commit()
@@ -110,7 +104,7 @@ def db_insert_default(session):
 
 		r3p1 = db.Password()
 		r3p1.rid = r3.id
-		r3p1.key = 'lpp'
+		r3p1.key = sha.new('lpp').hexdigest()
 		try:
 			session.add(r3p1)
 			session.commit()
@@ -121,7 +115,7 @@ def db_insert_default(session):
 
 		r3p2 = db.Password()
 		r3p2.rid = r3.id
-		r3p2.key = 'lpphoto'
+		r3p2.key = sha.new('lpphoto').hexdigest()
 		try:
 			session.add(r3p2)
 			session.commit()
@@ -132,7 +126,7 @@ def db_insert_default(session):
 
 		r3p3 = db.Password()
 		r3p3.rid = r3.id
-		r3p3.key = 'lpsport'
+		r3p3.key = sha.new('lpsport').hexdigest()
 		try:
 			session.add(r3p3)
 			session.commit()
@@ -200,7 +194,7 @@ def db_insert_default(session):
 
 		r4p1 = db.Password()
 		r4p1.rid = r4.id
-		r4p1.key = 'friend'
+		r4p1.key = sha.new('friend').hexdigest()
 		try:
 			session.add(r4p1)
 			session.commit()
@@ -219,5 +213,8 @@ def db_insert_default(session):
 			session.rollback()
 			print 'DB_INIT:rf14 register failed.'
 			return False
+
+dbsession = db.db_init(cfg.get('database', 'url')+'?check_same_thread=False')
+db_insert_default(dbsession)
 
 import views

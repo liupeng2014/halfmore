@@ -1,0 +1,64 @@
+#!/bin/bash
+# $Id$
+#
+# logrecv     halfmore
+# Author:     Peng Liu
+# description: 
+# processname: 
+
+PYTHON=/usr/bin/python2.7
+CONFIG1=/home/liupeng/halfmore/web.conf
+PYTHONPATH=/home/liupeng/halfmore
+
+start() {
+    echo -n $"Starting halfmore: "
+
+    [ -e $CONFIG1 ] || failure || exit 1
+
+    cd /home/liupeng
+    PYTHONPATH=$PYTHONPATH $PYTHON -m halfmore $CONFIG1&
+
+    ip rule add fwmark 1 lookup 100
+    ip route add local 0.0.0.0/0 dev lo table 100
+
+    echo
+    return 0
+}
+
+stop () {
+    echo -n $"Stopping halfmore: "
+
+    /usr/bin/pkill -15 -f "python runserver.py"
+
+    ip rule del fwmark 1 lookup 100 > /dev/null 2>&1
+    ip route del local 0.0.0.0/0 dev lo table 100 > /dev/null 2>&1
+ 
+    echo
+    return 0
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status $prog
+        ;;
+  restart|reload)
+        stop
+        start
+        ;;
+  condrestart)
+        status $prog &>/dev/null || exit 0
+        stop
+        start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart|condrestart|status}"
+        exit 1
+esac
+exit $?
+
