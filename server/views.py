@@ -10,7 +10,7 @@ import kazoo.exceptions
 from flask import Flask, session, render_template, redirect, url_for, request, jsonify, abort, flash
 
 from server import app, forms, logger
-from server import db as dbsession
+from server import db, dbsession
 
 
 def checkSession():
@@ -49,6 +49,7 @@ def login():
 		rp = form.getRP()
 		if rp:
 			session['rpid'] = rp.id
+			session['rolename'] = rp.role.name
 			LOG('login')
 			return redirect(url_for('homepage'))
 
@@ -58,9 +59,8 @@ def login():
 def logout():
 	LOG('logout')
 
-	session.pop('userid', None)
-	session.pop('username', None)
-	session.pop('role', None)
+	session.pop('rpid', None)
+	session.pop('rolename', None)
 	if session.get('operation') is not None:
 		session.pop('operation', None)
 	if session.get('networkname') is not None:
@@ -84,11 +84,11 @@ def homepage():
 		form = forms.LoginForm()
 		return render_template('login.html', form=form)
 
-	if session.get('logtype') is not None:
-		session.pop('logtype', None)
-	if session.get('pagecount') is not None:
-		session.pop('pagecount', None)
-	if session.get('pageshow') is not None:
-		session.pop('pageshow', None)
+	rpid = session.get('rpid')
+	in_rpid = dbsession.query(db.RoleLink)\
+		.filter(db.RoleLink.out_rp == rpid).all()
+	for id in in_rpid:
+		role = dbsession.query(db.Role)\
+			.filter(db.Role.id)
 
 	return render_template('homepage.html')

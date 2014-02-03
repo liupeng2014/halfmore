@@ -19,7 +19,7 @@ class Role(Base):
 	email = Column(String(100), nullable=False)
 	create_date = Column(DateTime, default=func.now())
 	
-	password = relationship("Password", cascade="all,delete-orphan")
+	password = relationship("Password", cascade="all,delete-orphan", backref="role")
 
 class Password(Base):
 	__tablename__ = "password"
