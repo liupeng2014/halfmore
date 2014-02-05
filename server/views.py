@@ -85,10 +85,12 @@ def homepage():
 		return render_template('login.html', form=form)
 
 	rpid = session.get('rpid')
+	'''
 	in_rpid = dbsession.query(db.RoleLink)\
 		.filter(db.RoleLink.out_rp == rpid).all()
 	for id in in_rpid:
 		role = dbsession.query(db.Role)\
 			.filter(db.Role.id)
-
+	'''
+	
 	return render_template('homepage.html')

@@ -79,8 +79,8 @@ def db_insert_default(session):
 			return False
 
 		rl12 = db.RoleLink()
-		rl12.out_rp = r1p1.id
-		rl12.in_rp = r2p1.id
+		rl12.up_rp = r1p1.id
+		rl12.dn_rp = r2p1.id
 		try:
 			session.add(rl12)
 			session.commit()
@@ -136,8 +136,8 @@ def db_insert_default(session):
 			return False
 
 		rl13 = db.RoleLink()
-		rl13.out_rp = r1p1.id
-		rl13.in_rp = r3p1.id
+		rl13.up_rp = r1p1.id
+		rl13.dn_rp = r3p1.id
 		try:
 			session.add(rl13)
 			session.commit()
@@ -147,8 +147,8 @@ def db_insert_default(session):
 			return False
 
 		rl13 = db.RoleLink()
-		rl13.out_rp = r1p1.id
-		rl13.in_rp = r3p1.id
+		rl13.up_rp = r1p1.id
+		rl13.dn_rp = r3p1.id
 		try:
 			session.add(rl13)
 			session.commit()
@@ -158,8 +158,8 @@ def db_insert_default(session):
 			return False
 
 		rl32 = db.RoleLink()
-		rl32.out_rp = r3p1.id
-		rl32.in_rp = r3p2.id
+		rl32.up_rp = r3p1.id
+		rl32.dn_rp = r3p2.id
 		try:
 			session.add(rl32)
 			session.commit()
@@ -169,8 +169,8 @@ def db_insert_default(session):
 			return False
 
 		rl33 = db.RoleLink()
-		rl33.out_rp = r3p1.id
-		rl33.in_rp = r3p3.id
+		rl33.up_rp = r3p1.id
+		rl33.dn_rp = r3p3.id
 		try:
 			session.add(rl33)
 			session.commit()
@@ -204,8 +204,8 @@ def db_insert_default(session):
 			return False
 
 		rf14 = db.RoleFollow()
-		rf14.up_role = r1.id
-		rf14.down_rp = r4p1.id
+		rf14.center_role = r1.id
+		rf14.follow_rp = r4p1.id
 		try:
 			session.add(rf14)
 			session.commit()

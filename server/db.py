@@ -41,18 +41,18 @@ class Profile(Base):
 # RoleLink is for one person.
 class RoleLink(Base):
 	__tablename__ = "role_link"
-	__table_args__ = (UniqueConstraint("out_rp", "in_rp"),)
+	__table_args__ = (UniqueConstraint("up_rp", "dn_rp"),)
 	id = Column(Integer, primary_key=True)
-	out_rp = Column(Integer, ForeignKey("password.id"))
-	in_rp = Column(Integer, ForeignKey("password.id"))
+	up_rp = Column(Integer, ForeignKey("password.id"))
+	dn_rp = Column(Integer, ForeignKey("password.id"))
 
 # RoleFollow if for two persons.
 class RoleFollow(Base):
 	__tablename__ = "role_follow"
-	__table_args__ = (UniqueConstraint("up_role", "down_rp"),)
+	__table_args__ = (UniqueConstraint("center_role", "follow_rp"),)
 	id = Column(Integer, primary_key=True)
-	up_role = Column(Integer, ForeignKey("role.id"))
-	down_rp = Column(Integer, ForeignKey("password.id"))
+	center_role = Column(Integer, ForeignKey("role.id"))
+	follow_rp = Column(Integer, ForeignKey("password.id"))
 
 class RoleBlock(Base):
 	__tablename__ = "role_block"
