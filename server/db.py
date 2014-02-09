@@ -39,7 +39,7 @@ class Profile(Base):
 	locate = Column(String(100))
 
 # RoleLink is for one person.
-class RoleLink(Base):
+class RolePassLink(Base):
 	__tablename__ = "role_link"
 	__table_args__ = (UniqueConstraint("up_rp", "dn_rp"),)
 	id = Column(Integer, primary_key=True)

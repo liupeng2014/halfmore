@@ -78,7 +78,7 @@ def db_insert_default(session):
 			print 'DB_INIT:liupeng_company pass register failed.'
 			return False
 
-		rl12 = db.RoleLink()
+		rl12 = db.RolePassLink()
 		rl12.up_rp = r1p1.id
 		rl12.dn_rp = r2p1.id
 		try:
@@ -135,7 +135,7 @@ def db_insert_default(session):
 			print 'DB_INIT:liupeng_private pass3 register failed.'
 			return False
 
-		rl13 = db.RoleLink()
+		rl13 = db.RolePassLink()
 		rl13.up_rp = r1p1.id
 		rl13.dn_rp = r3p1.id
 		try:
@@ -146,7 +146,7 @@ def db_insert_default(session):
 			print 'DB_INIT:rl13 register failed.'
 			return False
 
-		rl13 = db.RoleLink()
+		rl13 = db.RolePassLink()
 		rl13.up_rp = r1p1.id
 		rl13.dn_rp = r3p1.id
 		try:
@@ -157,7 +157,7 @@ def db_insert_default(session):
 			print 'DB_INIT:rl13 register failed.'
 			return False
 
-		rl32 = db.RoleLink()
+		rl32 = db.RolePassLink()
 		rl32.up_rp = r3p1.id
 		rl32.dn_rp = r3p2.id
 		try:
@@ -168,7 +168,7 @@ def db_insert_default(session):
 			print 'DB_INIT:rl32 register failed.'
 			return False
 
-		rl33 = db.RoleLink()
+		rl33 = db.RolePassLink()
 		rl33.up_rp = r3p1.id
 		rl33.dn_rp = r3p3.id
 		try:
