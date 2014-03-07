@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import re, binascii, socket, sha
+import re, binascii, socket
 
 from flask import flash
 from flask.ext.wtf import Form
@@ -12,6 +12,8 @@ from sqlalchemy.orm import sessionmaker
 
 from server import db, dbsession
 
+import rolepass from hmlib as rp
+import dbhandler from hmlib as dbh
 
 class LoginForm(Form):
 	rolename = TextField('role')
@@ -27,24 +29,6 @@ class LoginForm(Form):
 			return False
 
 		return True
-
-	def getRP(self):
-		role = dbsession.query(db.Role)\
-			.filter(db.Role.name==self.rolename.data).first()
-		if not role:
-			self.rolename.data = ""
-			flash(u"Wrong rolename")
-
-		encpass = sha.new(self.password.data).hexdigest()
-		rp = dbsession.query(db.Password)\
-			.filter(db.Password.rid == role.id)\
-			.filter(db.Password.key == encpass).first()
-		if not rp:
-			flash(u'Wrong password.')
-			self.rolename.data = ""
-			return False
-
-		return rp
 
 class RoleRegisterForm(Form):
 	userid = None

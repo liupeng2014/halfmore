@@ -12,7 +12,6 @@ from flask import Flask, session, render_template, redirect, url_for, request, j
 from server import app, forms, logger
 from server import db, dbsession
 
-
 def checkSession():
 	if session.get('operation') is not None:
 		session.pop('operation', None)
@@ -33,20 +32,14 @@ def LOG(*args):
 def index():
 	form = forms.LoginForm()
 
-	if session.get('pagecount') is not None:
-		session.pop('pagecount', None)
-
 	return render_template('login.html', form=form)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
 	form = forms.LoginForm()
 
-	if session.get('pagecount') is not None:
-		session.pop('pagecount', None)
-
 	if request.method == 'POST' and form.validate():
-		rp = form.getRP()
+		rp = form.get_rp()
 		if rp:
 			session['rpid'] = rp.id
 			session['rolename'] = rp.role.name
@@ -69,10 +62,6 @@ def logout():
 		session.pop('networkid', None)
 	if session.get('logtype') is not None:
 		session.pop('logtype', None)
-	if session.get('pagecount') is not None:
-		session.pop('pagecount', None)
-	if session.get('pageshow') is not None:
-		session.pop('pageshow', None)
 
 	form = forms.LoginForm()
 	return render_template('login.html', form=form)
