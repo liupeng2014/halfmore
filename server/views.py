@@ -66,6 +66,9 @@ def logout():
 	form = forms.LoginForm()
 	return render_template('login.html', form=form)
 
+def query_rp_link(rpid):
+	return dbsession.query(db.RolePassLink)\
+		.filter(db.RoleLink.up_rp == rpid).all()
 
 @app.route('/homepage')
 def homepage():
@@ -74,10 +77,7 @@ def homepage():
 		return render_template('login.html', form=form)
 
 	rpid = session.get('rpid')
-	in_rpid = dbsession.query(db.RoleLink)\
-		.filter(db.RoleLink.out_rp == rpid).all()
-	for id in in_rpid:
-		role = dbsession.query(db.Role)\
-			.filter(db.Role.id)
+	rplink = query_rp_link(rpid)
+	rplinktree = {'up':rpid, 'dn':rplink}
 
 	return render_template('homepage.html')
