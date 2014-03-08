@@ -250,9 +250,11 @@ def register_login(*args, **kwargs):
 		dbsession.rollback()
 		return False
 
-def delete_login(rp_id=None):
+def delete_all_login(rp_id=None):
 	try:
-		dbsession.query(db.Login).filter(db.Login.rp==rp_id).delete()
+		dbsession.query(db.Login)\
+		.filter(db.Login.rp==rp_id)\
+		.delete()
 		dbsession.commit()
 		return True
 	except exc.SQLAlchemyError:
@@ -340,7 +342,18 @@ def delete_rolelink(*args, **kwargs):
 	try:
 		dbsession.delete(rl)
 		dbsession.commit()
-		return rp
+		return rl
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_all_rolelink(rp_id=None):
+	try:
+		dbsession.query(db.RoleLink)\
+		.filter(db.RoleLink.rp==rp_id)\
+		.delete()
+		dbsession.commit()
+		return True
 	except exc.SQLAlchemyError:
 		dbsession.rollback()
 		return False
@@ -348,16 +361,263 @@ def delete_rolelink(*args, **kwargs):
 def get_rolefollow(*args, **kwargs):
 	if kwargs.get('role_id') and kwargs.get('rp_id'):
 		return dbsession.query(db.RoleFollow)\
-				.filter(db.RoleLink.rp == kwargs.get('rp_id'))\
-				.filter(db.RoleLink.role == kwargs.get('role_id'))
+				.filter(db.RoleFollow.rp == kwargs.get('rp_id'))\
+				.filter(db.RoleFollow.role == kwargs.get('role_id'))
 				.first()
 	elif kwargs.get('rp_id'):
-		return dbsession.query(db.RoleLink)\
-				.filter(db.RoleLink.rp == kwargs.get('rp_id'))\
+		return dbsession.query(db.RoleFollow)\
+				.filter(db.RoleFollow.rp == kwargs.get('rp_id'))\
 				.all()
 	elif kwargs.get('role_id'):
-		return dbsession.query(db.RoleLink)\
-				.filter(db.RoleLink.role == kwargs.get('role_id'))\
+		return dbsession.query(db.RoleFollow)\
+				.filter(db.RoleFollow.role == kwargs.get('role_id'))\
 				.all()
 	else
+		return False
+
+def register_rolefollow(*args, **kwargs):
+	rf = config.RoleFollow()
+	rf.role = kwargs.get('role_id')
+	rf.rp = kwargs.get('rp_id')
+	try:
+		dbsession.add(rf)
+		dbsession.commit()
+		return rf
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_rolefollow(*args, **kwargs):
+	rf = get_rolefollow(*args, **kwargs)
+	if rf is None or isinstance(rf, list):
+		return False
+
+	try:
+		dbsession.delete(rf)
+		dbsession.commit()
+		return rf
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_all_rolefollow(role_id=None):
+	try:
+		dbsession.query(db.RoleFollow)\
+		.filter(db.RoleFollow.role==role_id)\
+		.delete()
+		dbsession.commit()
+		return True
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def get_roleblock(*args, **kwargs):
+	if kwargs.get('role_id') and kwargs.get('blocked_role_id'):
+		return dbsession.query(db.RoleBlock)\
+				.filter(db.RoleBlock.role == kwargs.get('role_id'))\
+				.filter(db.RoleBlock.blocked_role == kwargs.get('blocked_role_id'))
+				.first()
+	elif kwargs.get('role_id'):
+		return dbsession.query(db.RoleBlock)\
+				.filter(db.RoleBlock.rp == kwargs.get('role_id'))\
+				.all()
+	elif kwargs.get('blocked_role_id'):
+		return dbsession.query(db.RoleBlock)\
+				.filter(db.RoleBlock.role == kwargs.get('blocked_role_id'))\
+				.all()
+	else
+		return False
+
+def register_roleblock(*args, **kwargs):
+	rb = config.RoleBlock()
+	rb.role = kwargs.get('role_id')
+	rb.blocked_role = kwargs.get('blocked_role_id')
+	try:
+		dbsession.add(rb)
+		dbsession.commit()
+		return rb
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_roleblock(*args, **kwargs):
+	rb = get_roleblock(*args, **kwargs)
+	if rb is None or isinstance(rb, list):
+		return False
+
+	try:
+		dbsession.delete(rb)
+		dbsession.commit()
+		return rb
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_all_roleblock(role_id=None):
+	try:
+		dbsession.query(db.RoleBlock)\
+		.filter(db.RoleBlock.role==role_id)\
+		.delete()
+		dbsession.commit()
+		return True
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def get_group(group_id=None):
+	return dbsession.query(db.Group)\
+			.filter(db.Group.id == group_id)\
+			.first()
+
+def register_group(*args, **kwargs):
+	group = config.group()
+	group.name = kwargs.get('name')
+	group.open_status = kwargs.get('open_status')
+	group.creater_id = kwargs.get('role_id')
+	try:
+		dbsession.add(group)
+		dbsession.commit()
+		return group
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def update_group(*args, **kwargs):
+	group = get_role(kwargs.get('group_id'))
+	if group is None:
+		return False
+
+	group.name = kwargs.get('name', group.name)
+	group.open_status = kwargs.get('name', group.open_status)
+	group.modify_time = datetime.now()
+	try:
+		dbsession.commit()
+		return group
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_group(group_id=None):
+	group = get_group(group_id)
+	if group is None:
+		return False
+
+	try:
+		dbsession.delete(group)
+		dbsession.commit()
+		return group
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def get_groupmanager(*args, **kwargs):
+	group_id = kwargs.get('group_id')
+	manager_rp = kwargs.get('manager_rp')
+
+	if group_id and manager_rp:
+		return dbsession.query(db.GroupManager)\
+				.filter(db.GroupManager.group_id == group_id)\
+				.filter(db.GroupManager.manager_rp == manager_rp)
+				.first()
+	elif group_id:
+		return dbsession.query(db.GroupManager)\
+				.filter(db.GroupManager.group_id == group_id)\
+				.all()
+	elif manager_rp:
+		return dbsession.query(db.GroupManager)\
+				.filter(db.GroupManager.manager_rp == manager_rp)\
+				.all()
+	else
+		return False
+
+def register_groupmanager(*args, **kwargs):
+	gm = config.GroupManager()
+	gm.group_id = kwargs.get('group_id')
+	gm.manager_rp = kwargs.get('manager_rp')
+	try:
+		dbsession.add(gm)
+		dbsession.commit()
+		return gm
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_groupmanager(*args, **kwargs):
+	gm = get_groupmanager(*args, **kwargs)
+	if gm is None or isinstance(gm, list):
+		return False
+
+	try:
+		dbsession.delete(gm)
+		dbsession.commit()
+		return gm
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_all_groupmanager(group_id=None):
+	try:
+		dbsession.query(db.GroupManager)\
+		.filter(db.GroupManager.group_id==group_id)\
+		.delete()
+		dbsession.commit()
+		return True
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def get_groupjoiner(*args, **kwargs):
+	group_id = kwargs.get('group_id')
+	joiner_rp = kwargs.get('joiner_rp')
+
+	if group_id and joiner_rp:
+		return dbsession.query(db.GroupJoiner)\
+				.filter(db.GroupJoiner.group_id == group_id)\
+				.filter(db.GroupJoiner.joiner_rp == joiner_rp)
+				.first()
+	elif group_id:
+		return dbsession.query(db.GroupJoiner)\
+				.filter(db.GroupJoiner.group_id == group_id)\
+				.all()
+	elif joiner_rp:
+		return dbsession.query(db.GroupJoiner)\
+				.filter(db.GroupJoiner.joiner_rp == joiner_rp)\
+				.all()
+	else
+		return False
+
+def register_groupjoiner(*args, **kwargs):
+	gj = config.GroupJoiner()
+	gj.group_id = kwargs.get('group_id')
+	gj.joiner_rp = kwargs.get('joiner_rp')
+	try:
+		dbsession.add(gj)
+		dbsession.commit()
+		return gj
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_groupjoiner(*args, **kwargs):
+	gj = get_groupjoiner(*args, **kwargs)
+	if gj is None or isinstance(gj, list):
+		return False
+
+	try:
+		dbsession.delete(gj)
+		dbsession.commit()
+		return gj
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def delete_all_groupjoiner(group_id=None):
+	try:
+		dbsession.query(db.GroupJoiner)\
+		.filter(db.GroupJoiner.group_id==group_id)\
+		.delete()
+		dbsession.commit()
+		return True
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
 		return False

@@ -83,7 +83,8 @@ class Group(Base):
 	name = Column(String(50), unique=True, nullable=False)
 	open_status = Column(Integer, nullable=False) # 0:all, 1:can search, 2:private
 	creater_id = Column(Integer, ForeignKey('role.id'))
-	create_date = Column(DateTime, default=func.now())
+	create_time = Column(DateTime, default=func.now())
+	update_time = Column(DateTime, default=func.now())
 
 class GroupLink(Base):
 	__tablename__ = 'group_link'
@@ -97,16 +98,14 @@ class GroupManager(Base):
 	__table_args__ = (UniqueConstraint('group_id', 'manager_id', 'manager_pass'),)
 	id = Column(Integer, primary_key=True)
 	group_id = Column(Integer, ForeignKey('group.id'))
-	manager_id = Column(Integer, ForeignKey('role.id'))
-	manager_pass = Column(Integer, ForeignKey('password.key'))
+	manager_rp = Column(Integer, ForeignKey('role_password.id'))
 
 class GroupJoiner(Base):
 	__tablename__ = 'group_joiner'
 	__table_args__ = (UniqueConstraint('group_id', 'joiner_id', 'joiner_pass'),)
 	id = Column(Integer, primary_key=True)
 	group_id = Column(Integer, ForeignKey('group.id'))
-	joiner_id = Column(Integer, ForeignKey('role.id'))
-	joiner_pass = Column(Integer, ForeignKey('password.key'))
+	joiner_rp = Column(Integer, ForeignKey('role_password.id'))
 
 class Input(Base):
 	__tablename__ = 'input'
