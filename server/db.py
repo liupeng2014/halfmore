@@ -15,7 +15,6 @@ def db_init(*args, **kwargs):
 
 class Role(Base):
 	__tablename__ = 'role'
-	__table_args__ = (UniqueConstraint('name','email'),)
 	id = Column(Integer, primary_key=True)
 	name = Column(String(50), nullable=False, unique=True)
 	create_time = Column(DateTime, default=func.now())
@@ -47,8 +46,8 @@ class Profile(Base):
 	id = Column(Integer, primary_key=True)
 	rp = Column(Integer, ForeignKey('role_password.id'))
 	email = Column(String(100), nullable=False)
-	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:secret, 2:friend, 3:group
-	gender = Column(Integer)
+	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:group, 2:self
+	gender = Column(Integer, default=2) # 0:woman, 1:man, 2:secret
 	location = Column(String(100))
 	update_time = Column(DateTime, default=func.now())
 
@@ -72,7 +71,7 @@ class RoleFollow(Base):
 
 class RoleBlock(Base):
 	__tablename__ = 'role_block'
-	__table_args__ = (UniqueConstraint('rp', 'block_role'),)
+	__table_args__ = (UniqueConstraint('role', 'block_role'),)
 	id = Column(Integer, primary_key=True)
 	role = Column(Integer, ForeignKey('role.id'))
 	blocked_role = Column(Integer, ForeignKey('role.id'))
@@ -81,8 +80,8 @@ class Group(Base):
 	__tablename__ = 'group'
 	id = Column(Integer, primary_key=True)
 	name = Column(String(50), unique=True, nullable=False)
-	open_status = Column(Integer, nullable=False) # 0:all, 1:can search, 2:private
-	creater_id = Column(Integer, ForeignKey('role.id'))
+	open_status = Column(Integer, nullable=False, default=0) # 0:all, 1:can search, 2:private
+	creater_id = Column(Integer, ForeignKey('role_password.id'))
 	create_time = Column(DateTime, default=func.now())
 	update_time = Column(DateTime, default=func.now())
 
@@ -95,14 +94,14 @@ class GroupLink(Base):
 
 class GroupManager(Base):
 	__tablename__ = 'group_manager'
-	__table_args__ = (UniqueConstraint('group_id', 'manager_id', 'manager_pass'),)
+	__table_args__ = (UniqueConstraint('group_id', 'manager_id'),)
 	id = Column(Integer, primary_key=True)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	manager_rp = Column(Integer, ForeignKey('role_password.id'))
 
 class GroupJoiner(Base):
 	__tablename__ = 'group_joiner'
-	__table_args__ = (UniqueConstraint('group_id', 'joiner_id', 'joiner_pass'),)
+	__table_args__ = (UniqueConstraint('group_id', 'joiner_id'),)
 	id = Column(Integer, primary_key=True)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	joiner_rp = Column(Integer, ForeignKey('role_password.id'))
@@ -110,15 +109,50 @@ class GroupJoiner(Base):
 class Input(Base):
 	__tablename__ = 'input'
 	id = Column(Integer, primary_key=True)
-	# 0:one action, 1:long text, 2:short text, 3: comment, 4:pic, 5:video, 6:sound, 7:plan
+	# 0:short_message, 1:long_message, 2: comment, 3:schedule, 4:trade
 	type = Column(Integer, nullable=False)
-	create_id = Column(Integer, ForeignKey('role.id'))
-	create_pass = Column(Integer, ForeignKey('password.key'))
-	create_date = Column(DateTime, default=func.now())
+	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
+	create_time = Column(DateTime, default=func.now())
+	update_time = Column(DateTime, default=func.now())
 
-class Message(Base):
-	__tablename__ = 'message'
+	short_message = relationship('ShortMessage', cascade='all,delete-orphan')
+	long_message = relationship('LongMessage', cascade='all,delete-orphan')
+	comment = relationship('Comment', cascade='all,delete-orphan')
+
+class Media(Base):
+	__tablename__ = 'media'
 	id = Column(Integer, primary_key=True)
-	text = Column(String(100))
+	# 0:text 1:pic 2:video 3:audio
+	type = Column(Integer, nullable=False)
 
+class ShortMessage(Base):
+	__tablename__ = 'short_message'
+	id = Column(Integer, primary_key=True)
+	input_id = Column(Integer, ForeignKey('input.id'))
+	text = Column(String(200))
+	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	group_id = Column(Integer, ForeignKey('group.id'))
+	create_time = Column(DateTime, default=func.now())
+	update_time = Column(DateTime, default=func.now())
+
+class LongMessage(Base):
+	__tablename__ = 'long_message'
+	id = Column(Integer, primary_key=True)
+	input_id = Column(Integer, ForeignKey('input.id'))
+	text = Column(String(2000))
+	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	group_id = Column(Integer, ForeignKey('group.id'))
+	create_time = Column(DateTime, default=func.now())
+	update_time = Column(DateTime, default=func.now())
+
+class Comment(Base):
+	__tablename__ = 'comment'
+	id = Column(Integer, primary_key=True)
+	input_id = Column(Integer, ForeignKey('input.id'))
+	parent_id = Column(Integer, ForeignKey('input.id'), nullable=False)
+	text = Column(String(2000))
+	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	group_id = Column(Integer, ForeignKey('group.id'))
+	create_time = Column(DateTime, default=func.now())
+	update_time = Column(DateTime, default=func.now())

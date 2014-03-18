@@ -6,30 +6,35 @@ from sqlalchemy import exc
 from server import db, dbsession, logger
 
 '''
-r1: liupeng
+r1: hm_own
 r1p1: public
 r1p2: group
 r1p3: private
-r2: liupeng_work
+r2: hm_work
 r2p1: public
 r2p2: group
 r2p3: private
 r2p1 <- r1
 r2p2 <- r1
+r3: friend1
+r3p1: friend1
+r1 <- r3p1
+r3 <- r1p1
+r4: friend2
+r4p1: friend2
 '''
 def db_insert_default(session):
 	r1 = session.query(db.Role)\
-		.filter(db.Role.name == 'liupeng').first()
+		.filter(db.Role.name == 'hm_own').first()
 	if r1 is None:
 		r1 = db.Role()
-		r1.name = 'liupeng'
-		r1.email = 'liupeng@gmail.com'
+		r1.name = 'hm_own'
 		try:
 			session.add(r1)
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:role=liupeng register failed.")
+			logger.info('%s', "DB_INIT:role=hm_own register failed.")
 			return False
 
 		r1p1 = db.Password()
@@ -48,20 +53,50 @@ def db_insert_default(session):
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:liupeng pass register failed.")
+			logger.info('%s', "DB_INIT:hm_own pass register failed.")
+			return False
+
+		prof11 = db.Profile()
+		prof11.rp = r1p1.id
+		prof11.email = 'hm_own_open@gmail.com'
+		prof11.open_flag = 0
+		prof11.gender = 1
+		prof11.location = "Tokyo,Japan"
+
+		prof12 = db.Profile()
+		prof12.rp = r1p2.id
+		prof12.email = 'hm_own_group@gmail.com'
+		prof12.open_flag = 1
+		prof12.gender = 1
+		prof12.location = "Yokohama,Japan"
+
+		prof13 = db.Profile()
+		prof13.rp = r1p3.id
+		prof13.email = 'hm_own_self@gmail.com'
+		prof13.open_flag = 2
+		prof13.gender = 1
+		prof13.location = "Beijing,China"
+		try:
+			session.add(prof11)
+			session.add(prof12)
+			session.add(prof13)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:hm_own profile register failed.")
 			return False
 
 	if not session.query(db.Role)\
-		.filter(db.Role.name == 'liupeng_company').first():
+		.filter(db.Role.name == 'hm_work').first():
 		r2 = db.Role()
-		r2.name = 'liupeng_company'
-		r2.email = 'liupeng_company@gmail.com'
+		r2.name = 'hm_work'
+		r2.email = 'hm_work@gmail.com'
 		try:
 			session.add(r2)
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:role=liupeng_company register failed.")
+			logger.info('%s', "DB_INIT:role=hm_work register failed.")
 			return False
 
 		r2p1 = db.Password()
@@ -78,46 +113,76 @@ def db_insert_default(session):
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:liupeng_company pass register failed.")
+			logger.info('%s', "DB_INIT:hm_work pass register failed.")
+			return False
+
+		prof21 = db.Profile()
+		prof21.rp = r2p1.id
+		prof21.email = 'hm_work_open@gmail.com'
+		prof21.open_flag = 0
+		prof21.gender = 1
+		prof21.location = "Tiba,Japan"
+
+		prof22 = db.Profile()
+		prof22.rp = r2p2.id
+		prof22.email = 'hm_work_group@gmail.com'
+		prof22.open_flag = 1
+		prof22.gender = 1
+		prof22.location = "Tokyo,Japan"
+
+		prof23 = db.Profile()
+		prof23.rp = r2p3.id
+		prof23.email = 'hm_work_self@gmail.com'
+		prof23.open_flag = 2
+		prof23.gender = 1
+		prof23.location = "Tokyo,Japan"
+		try:
+			session.add(prof21)
+			session.add(prof22)
+			session.add(prof23)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:hm_work profile register failed.")
 			return False
 
 		rl211 = db.RoleLink()
 		rl211.rp = r2p1.id
 		rl211.role = r1.id
-		rl221 = db.RoleLink()
-		rl221.rp = r2p2.id
-		rl221.role = r1.id
+		rl231 = db.RoleLink()
+		rl231.rp = r2p3.id
+		rl231.role = r1.id
 		try:
 			session.add(rl211)
-			session.add(rl221)
+			session.add(rl231)
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:rl12 register failed.")
+			logger.info('%s', "DB_INIT:rolelink register failed.")
 			return False
 
 	if not session.query(db.Role)\
-		.filter(db.Role.name == 'friend').first():
+		.filter(db.Role.name == 'friend1').first():
 		r3 = db.Role()
-		r3.name = 'friend'
-		r3.email = 'friend@friend.com'
+		r3.name = 'friend1'
+		r3.email = 'friend1@gmail.com'
 		try:
 			session.add(r3)
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:role=friend register failed.")
+			logger.info('%s', "DB_INIT:role=friend1 register failed.")
 			return False
 
 		r3p1 = db.Password()
-		r3p1.rid = r4.id
-		r3p1.key = sha.new('friend').hexdigest()
+		r3p1.rid = r3.id
+		r3p1.key = sha.new('friend1').hexdigest()
 		try:
 			session.add(r3p1)
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:friend pass register failed.")
+			logger.info('%s', "DB_INIT:friend1 pass register failed.")
 			return False
 
 		rf13 = db.RoleFollow()
@@ -132,13 +197,136 @@ def db_insert_default(session):
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
-			logger.info('%s', "DB_INIT:rf13 register failed.")
+			logger.info('%s', "DB_INIT:rf13 rf31 register failed.")
+			return False
+
+	if not session.query(db.Role)\
+		.filter(db.Role.name == 'friend2').first():
+		r4 = db.Role()
+		r4.name = 'friend2'
+		r4.email = 'friend2@gmail.com'
+		try:
+			session.add(r4)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:role=friend2 register failed.")
+			return False
+
+		r4p1 = db.Password()
+		r4p1.rid = r4.id
+		r4p1.key = sha.new('friend2').hexdigest()
+		try:
+			session.add(r4p1)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:friend2 pass register failed.")
+			return False
+
+		rf14 = db.RoleFollow()
+		rf14.up_role = r1.id
+		rf14.down_rp = r4p1.id
+		try:
+			session.add(rf14)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:rf14 register failed.")
+			return False
+
+		rf24 = db.RoleBlock()
+		rf24.role = r2.id
+		rf24.blocked_rp = r4.id
+		try:
+			session.add(rf24)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:rf24 register failed.")
+			return False
+
+	if not session.query(db.Group)\
+		.filter(db.Group.name == 'A_college').first():
+		g1 = db.Group()
+		g1.name = 'A_college'
+		g1.open_status = 0
+		g1.creater_id = r1p1.id
+		try:
+			session.add(g1)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:group1 register failed.")
+			return False
+
+		gm1 = db.GroupManager()
+		gm1.group_id = g1.id
+		gm1.manager_rp = r1p1.id
+		try:
+			session.add(gm1)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:gm1 register failed.")
+			return False
+
+		gj1 = db.GroupJoiner()
+		gj1.group_id = g1.id
+		gj1.joiner_rp = r1p1.id
+		try:
+			session.add(gj1)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:gj1 register failed.")
+			return False
+
+	if not session.query(db.Group)\
+		.filter(db.Group.name == 'Develop_group').first():
+		g2 = db.Group()
+		g2.name = 'Develop_group'
+		g2.open_status = 0
+		g2.creater_id = r2p1.id
+		try:
+			session.add(g2)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:group2 register failed.")
+			return False
+
+		gm2 = db.GroupManager()
+		gm2.group_id = g2.id
+		gm2.manager_rp = r2p1.id
+		try:
+			session.add(gm2)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:gm2 register failed.")
+			return False
+
+		gj2 = db.GroupManager()
+		gj2.group_id = g2.id
+		gj2.joiner_rp = r2p2.id
+		try:
+			session.add(gm1)
+			session.commit()
+		except exc.SQLAlchemyError:
+			session.rollback()
+			logger.info('%s', "DB_INIT:gj2 register failed.")
 			return False
 
 def get_role(role_id=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.id == role_id)\
 			.first()
+
+def get_role_by_rp(rp_id=None):
+	role = dbsession.query(db.Role)\
+		.filter(db.Role.password.id == rp_id)\
+		.first()
 
 def register_role(*args, **kwargs):
 	role = config.Role()
@@ -531,9 +719,27 @@ def get_groupmanager(*args, **kwargs):
 		return False
 
 def register_groupmanager(*args, **kwargs):
+	rp = kwargs.get('manager_rp')
+	if rp is None:
+		return False
+	role = get_role_by_rp(rp)
+
+	gid = kwargs.get('group_id')
+	if gid is None:
+		return False
+
+	rid_list = []
+	for gm in get_groupmanager(group_id=gid):
+		role = get_role_by_rp(gm.manager_rp)
+		if role is not None:
+			rid_list.append(role.id)
+
+	if role.id in rid_list:
+		return False
+
 	gm = config.GroupManager()
-	gm.group_id = kwargs.get('group_id')
-	gm.manager_rp = kwargs.get('manager_rp')
+	gm.group_id = gid
+	gm.manager_rp = rp
 	try:
 		dbsession.add(gm)
 		dbsession.commit()
@@ -587,9 +793,27 @@ def get_groupjoiner(*args, **kwargs):
 		return False
 
 def register_groupjoiner(*args, **kwargs):
+	rp = kwargs.get('joiner_rp')
+	if rp is None:
+		return False
+	role = get_role_by_rp(rp)
+
+	gid = kwargs.get('group_id')
+	if gid is None:
+		return False
+
+	rid_list = []
+	for gj in get_groupjoiner(group_id=gid):
+		role = get_role_by_rp(gj.joiner_rp)
+		if role is not None:
+			rid_list.append(role.id)
+
+	if role.id in rid_list:
+		return False
+
 	gj = config.GroupJoiner()
-	gj.group_id = kwargs.get('group_id')
-	gj.joiner_rp = kwargs.get('joiner_rp')
+	gj.group_id = gid
+	gj.joiner_rp = rp
 	try:
 		dbsession.add(gj)
 		dbsession.commit()
