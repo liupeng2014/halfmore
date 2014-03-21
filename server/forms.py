@@ -12,8 +12,8 @@ from sqlalchemy.orm import sessionmaker
 
 from server import db, dbsession
 
-import rolepass from hmlib as rp
-import dbhandler from hmlib as dbh
+import rolepass as rp
+import dbhandler as dbh
 
 class LoginForm(Form):
 	rolename = TextField('role')
@@ -28,7 +28,10 @@ class LoginForm(Form):
 			flash(u'Password is required.')
 			return False
 
-		return True
+		return True		
+
+class HomeForm(Form):
+	pass
 
 class RoleRegisterForm(Form):
 	userid = None
