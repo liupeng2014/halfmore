@@ -13,7 +13,6 @@ from sqlalchemy.orm import sessionmaker
 from server import db, dbsession
 
 import rolepass from hmlib as rp
-import dbhandler from hmlib as dbh
 
 class LoginForm(Form):
 	rolename = TextField('role')
