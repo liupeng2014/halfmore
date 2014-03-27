@@ -47,5 +47,16 @@
 			<tr>
 				<td colspan="5" height="10"></td>
 			</tr>
+			<tr>
+				<td colspan="5" height="10">rpid={{ form.rpid }}</td>
+			</tr>
+			{% for link in form.links %}
+			<tr>
+				<td colspan="5" height="10">linked_role={{ link.linked_role }}</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td colspan="5" height="10">end</td>
+			</tr>
 		</table>
 {% endblock %}

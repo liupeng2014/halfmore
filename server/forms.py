@@ -28,7 +28,10 @@ class LoginForm(Form):
 			flash(u'Password is required.')
 			return False
 
-		return True
+		return True		
+
+class HomeForm(Form):
+	pass
 
 class RoleRegisterForm(Form):
 	userid = None

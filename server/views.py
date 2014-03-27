@@ -10,7 +10,7 @@ import kazoo.exceptions
 from flask import Flask, session, render_template, redirect, url_for, request, jsonify, abort, flash
 
 from server import app, forms, logger
-from server import db, dbsession
+from server import dbhandler as dbh
 
 def checkSession():
 	if session.get('operation') is not None:
@@ -38,19 +38,22 @@ def index():
 def login():
 	form = forms.LoginForm()
 
+	print "liu1"
 	if request.method == 'POST' and form.validate():
-		rp = form.get_rp()
+		print "liu2"
+		rp = dbh.get_rp(role_name=form.rolename.data, key=form.password.data)
+		print "liu3"
 		if rp:
+			print "liu4"
 			session['rpid'] = rp.id
-			session['rolename'] = rp.role.name
-			LOG('login')
+#			LOG('login')
 			return redirect(url_for('homepage'))
 
 	return render_template('login.html', form=form)
 
 @app.route('/logout', methods = ['GET', 'POST'])
 def logout():
-	LOG('logout')
+#	LOG('logout')
 
 	session.pop('rpid', None)
 	session.pop('rolename', None)
@@ -66,18 +69,20 @@ def logout():
 	form = forms.LoginForm()
 	return render_template('login.html', form=form)
 
-def query_rp_link(rpid):
-	return dbsession.query(db.RolePassLink)\
-		.filter(db.RoleLink.up_rp == rpid).all()
-
 @app.route('/homepage')
 def homepage():
 	if not checkSession():
 		form = forms.LoginForm()
 		return render_template('login.html', form=form)
 
-	rpid = session.get('rpid')
-	rplink = query_rp_link(rpid)
-	rplinktree = {'up':rpid, 'dn':rplink}
+	form = forms.HomeForm()
+	form.rpid = session.get('rpid')
+	form.role = dbh.get_role_by_rp(form.rpid)
+	form.profile = dbh.get_profile(form.rpid)
+	form.links = dbh.get_rolelink(form.rpid)
+	form.follows = dbh.get_rolefollow(form.rpid)
+	form.blocks = dbh.get_roleblock(form.rpid)
+	form.groupm = dbh.get_groupmanager(manager_rp=form.rpid)
+	form.groupj = dbh.get_groupmanager(joiner_rp=form.rpid)
 
-	return render_template('homepage.html')
+	return render_template('homepage.html', form=form)

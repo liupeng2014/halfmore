@@ -318,6 +318,8 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:gj2 register failed.")
 			return False
 
+def get_role_info_from_rp(rp_id=None):
+
 def get_role(role_id=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.id == role_id)\
@@ -325,7 +327,7 @@ def get_role(role_id=None):
 
 def get_role_by_rp(rp_id=None):
 	role = dbsession.query(db.Role)\
-		.filter(db.Role.password.id == rp_id)\
+		.filter(db.RolePass.rp == rp_id)\
 		.first()
 
 def register_role(*args, **kwargs):
@@ -368,13 +370,13 @@ def delete_role(role_id=None):
 
 def get_rp(*args, **kwargs):
 	if kwargs.get('rp_id'):
-		return dbsession.query(db.Password)\
-			.filter(db.Password.id == kwargs['rp_id'])\
+		return dbsession.query(db.RolePass)\
+			.filter(db.RolePass.id == kwargs['rp_id'])\
 			.first()
-	else:
-		return dbsession.query(db.Password)\
-			.filter(db.Password.role.name == kwargs['role_id'])\
-			.filter(db.Password.key == sha.new(kwargs['key'].hexdigest()))\
+	elif kwargs.get('role_name') and kwargs.get('key'):
+		return dbsession.query(db.RolePass)\
+			.filter(db.Role.name == kwargs['role_name'])\
+			.filter(db.RolePass.key == sha.new(kwargs['key']).hexdigest())\
 			.first()
 
 def register_rp(*args, **kwargs):
