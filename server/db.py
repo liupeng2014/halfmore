@@ -147,6 +147,7 @@ class LongMessage(Base):
 	__tablename__ = 'long_message'
 	id = Column(Integer, primary_key=True)
 	input_id = Column(Integer, ForeignKey('input.id'))
+	title = Column(String(100))
 	text = Column(String(2000))
 	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
