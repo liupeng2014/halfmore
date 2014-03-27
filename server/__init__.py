@@ -11,8 +11,6 @@ from logging import FileHandler, Formatter
 from sqlalchemy import exc, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from hmlib import dbhandler as dbh
-
 try:
 	configfile = sys.argv[1]
 except:
@@ -31,6 +29,8 @@ logger.addHandler(logfile_handler)
 logger.setLevel(logging.DEBUG)
 
 dbsession = db.db_init(cfg.get('database', 'url')+'?check_same_thread=False')
+
+from server import dbhandler as dbh
 dbh.db_insert_default(dbsession)
 
 import views

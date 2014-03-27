@@ -20,10 +20,12 @@ class Role(Base):
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 	
-	password = relationship('Password', cascade='all,delete-orphan', backref='role')
+	rp = relationship('RolePass', cascade='all,delete-orphan', backref='role')
+	rl = relationship('RoleLink', cascade='all,delete-orphan', backref='role')
+	rf = relationship('RoleFollow', cascade='all,delete-orphan', backref='role')
 
-class RolePassword(Base):
-	__tablename__ = 'role_password'
+class RolePass(Base):
+	__tablename__ = 'role_pass'
 	__table_args__ = (UniqueConstraint('rid','key'),)
 	id = Column(Integer, primary_key=True)
 	rid = Column(Integer, ForeignKey('role.id'))
@@ -33,18 +35,21 @@ class RolePassword(Base):
 
 	login = relationship('Login', cascade='all,delete-orphan')
 	profile = relationship('Login', uselist=False, cascade='all,delete-orphan')
+	group = relationship('Group', cascade='all,delete-orphan')
+	gm = relationship('GroupManager', cascade='all,delete-orphan')
+	gj = relationship('GroupJoiner', cascade='all,delete-orphan')
 
 class Login(Base):
 	__tablename__ = 'login'
 	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_password.id'))
+	rp = Column(Integer, ForeignKey('role_pass.id'))
 	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
 	update_time = Column(DateTime, default=func.now())	
 
 class Profile(Base):
 	__tablename__ = 'profile'
 	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_password.id'))
+	rp = Column(Integer, ForeignKey('role_pass.id'))
 	email = Column(String(100), nullable=False)
 	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:group, 2:self
 	gender = Column(Integer, default=2) # 0:woman, 1:man, 2:secret
@@ -55,33 +60,36 @@ class Profile(Base):
 # rp is center, and roles are linked to rp.
 class RoleLink(Base):
 	__tablename__ = 'role_link'
-	__table_args__ = (UniqueConstraint('rp', 'role'),)
+	__table_args__ = (UniqueConstraint('rp', 'linked_role'),)
 	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_password.id'))
-	role = Column(Integer, ForeignKey('role.id'))
+	rp = Column(Integer, ForeignKey('role_pass.id'))
+	linked_role = Column(Integer, ForeignKey('role.id'))
 
 # RoleFollow if for two persons.
 # role is up, and rp follows role.
 class RoleFollow(Base):
 	__tablename__ = 'role_follow'
-	__table_args__ = (UniqueConstraint('role', 'rp'),)
+	__table_args__ = (UniqueConstraint('up_role', 'down_rp'),)
 	id = Column(Integer, primary_key=True)
-	role = Column(Integer, ForeignKey('role.id'))
-	rp = Column(Integer, ForeignKey('role_password.id'))
+	up_role = Column(Integer, ForeignKey('role.id'))
+	down_rp = Column(Integer, ForeignKey('role_pass.id'))
 
 class RoleBlock(Base):
 	__tablename__ = 'role_block'
-	__table_args__ = (UniqueConstraint('role', 'block_role'),)
+	__table_args__ = (UniqueConstraint('blocker_role_id', 'blocked_role_id'),)
 	id = Column(Integer, primary_key=True)
-	role = Column(Integer, ForeignKey('role.id'))
-	blocked_role = Column(Integer, ForeignKey('role.id'))
+	blocker_role_id = Column(Integer, ForeignKey('role.id'))
+	blocked_role_id = Column(Integer, ForeignKey('role.id'))
+
+	blocker_role = relationship('Role', foreign_keys=[blocker_role_id])
+	blocked_role = relationship('Role', foreign_keys=[blocked_role_id])
 
 class Group(Base):
 	__tablename__ = 'group'
 	id = Column(Integer, primary_key=True)
 	name = Column(String(50), unique=True, nullable=False)
 	open_status = Column(Integer, nullable=False, default=0) # 0:all, 1:can search, 2:private
-	creater_id = Column(Integer, ForeignKey('role_password.id'))
+	creater_rp = Column(Integer, ForeignKey('role_pass.id'))
 	create_time = Column(DateTime, default=func.now())
 	update_time = Column(DateTime, default=func.now())
 
@@ -94,31 +102,30 @@ class GroupLink(Base):
 
 class GroupManager(Base):
 	__tablename__ = 'group_manager'
-	__table_args__ = (UniqueConstraint('group_id', 'manager_id'),)
+	__table_args__ = (UniqueConstraint('group_id', 'manager_rp'),)
 	id = Column(Integer, primary_key=True)
 	group_id = Column(Integer, ForeignKey('group.id'))
-	manager_rp = Column(Integer, ForeignKey('role_password.id'))
+	manager_rp = Column(Integer, ForeignKey('role_pass.id'))
 
 class GroupJoiner(Base):
 	__tablename__ = 'group_joiner'
-	__table_args__ = (UniqueConstraint('group_id', 'joiner_id'),)
+	__table_args__ = (UniqueConstraint('group_id', 'joiner_rp'),)
 	id = Column(Integer, primary_key=True)
 	group_id = Column(Integer, ForeignKey('group.id'))
-	joiner_rp = Column(Integer, ForeignKey('role_password.id'))
+	joiner_rp = Column(Integer, ForeignKey('role_pass.id'))
 
 class Input(Base):
 	__tablename__ = 'input'
 	id = Column(Integer, primary_key=True)
 	# 0:short_message, 1:long_message, 2: comment, 3:schedule, 4:trade
 	type = Column(Integer, nullable=False)
-	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
 	update_time = Column(DateTime, default=func.now())
 
 	short_message = relationship('ShortMessage', cascade='all,delete-orphan')
 	long_message = relationship('LongMessage', cascade='all,delete-orphan')
-	comment = relationship('Comment', cascade='all,delete-orphan')
 
 class Media(Base):
 	__tablename__ = 'media'
@@ -131,7 +138,7 @@ class ShortMessage(Base):
 	id = Column(Integer, primary_key=True)
 	input_id = Column(Integer, ForeignKey('input.id'))
 	text = Column(String(200))
-	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
 	update_time = Column(DateTime, default=func.now())
@@ -141,7 +148,7 @@ class LongMessage(Base):
 	id = Column(Integer, primary_key=True)
 	input_id = Column(Integer, ForeignKey('input.id'))
 	text = Column(String(2000))
-	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
 	update_time = Column(DateTime, default=func.now())
@@ -152,7 +159,10 @@ class Comment(Base):
 	input_id = Column(Integer, ForeignKey('input.id'))
 	parent_id = Column(Integer, ForeignKey('input.id'), nullable=False)
 	text = Column(String(2000))
-	create_rp = Column(Integer, ForeignKey('role_password.id'), nullable=False)
+	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
 	update_time = Column(DateTime, default=func.now())
+
+	input = relationship('Input', foreign_keys=[input_id])
+	parent = relationship('Input', foreign_keys=[parent_id])

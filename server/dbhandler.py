@@ -37,13 +37,13 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:role=hm_own register failed.")
 			return False
 
-		r1p1 = db.Password()
+		r1p1 = db.RolePass()
 		r1p1.rid = r1.id
 		r1p1.key = sha.new('public').hexdigest()
-		r1p2 = db.Password()
+		r1p2 = db.RolePass()
 		r1p2.rid = r1.id
 		r1p2.key = sha.new('group').hexdigest()
-		r1p3 = db.Password()
+		r1p3 = db.RolePass()
 		r1p3.rid = r1.id
 		r1p3.key = sha.new('private').hexdigest()
 		try:
@@ -99,13 +99,13 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:role=hm_work register failed.")
 			return False
 
-		r2p1 = db.Password()
+		r2p1 = db.RolePass()
 		r2p1.rid = r2.id
 		r2p1.key = sha.new('public').hexdigest()
-		r2p2 = db.Password()
+		r2p2 = db.RolePass()
 		r2p2.rid = r2.id
 		r2p2.key = sha.new('group').hexdigest()
-		r2p3 = db.Password()
+		r2p3 = db.RolePass()
 		r2p3.rid = r2.id
 		r2p3.key = sha.new('private').hexdigest()
 		try:
@@ -148,10 +148,10 @@ def db_insert_default(session):
 
 		rl211 = db.RoleLink()
 		rl211.rp = r2p1.id
-		rl211.role = r1.id
+		rl211.linked_role = r1.id
 		rl231 = db.RoleLink()
 		rl231.rp = r2p3.id
-		rl231.role = r1.id
+		rl231.linked_role = r1.id
 		try:
 			session.add(rl211)
 			session.add(rl231)
@@ -174,7 +174,7 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:role=friend1 register failed.")
 			return False
 
-		r3p1 = db.Password()
+		r3p1 = db.RolePass()
 		r3p1.rid = r3.id
 		r3p1.key = sha.new('friend1').hexdigest()
 		try:
@@ -213,7 +213,7 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:role=friend2 register failed.")
 			return False
 
-		r4p1 = db.Password()
+		r4p1 = db.RolePass()
 		r4p1.rid = r4.id
 		r4p1.key = sha.new('friend2').hexdigest()
 		try:
@@ -236,8 +236,8 @@ def db_insert_default(session):
 			return False
 
 		rf24 = db.RoleBlock()
-		rf24.role = r2.id
-		rf24.blocked_rp = r4.id
+		rf24.blocker_role_id = r2.id
+		rf24.blocked_role_id = r4.id
 		try:
 			session.add(rf24)
 			session.commit()
@@ -251,7 +251,7 @@ def db_insert_default(session):
 		g1 = db.Group()
 		g1.name = 'A_college'
 		g1.open_status = 0
-		g1.creater_id = r1p1.id
+		g1.creater_rp = r1p1.id
 		try:
 			session.add(g1)
 			session.commit()
@@ -287,7 +287,7 @@ def db_insert_default(session):
 		g2 = db.Group()
 		g2.name = 'Develop_group'
 		g2.open_status = 0
-		g2.creater_id = r2p1.id
+		g2.creater_rp = r2p1.id
 		try:
 			session.add(g2)
 			session.commit()
@@ -374,11 +374,11 @@ def get_rp(*args, **kwargs):
 	else:
 		return dbsession.query(db.Password)\
 			.filter(db.Password.role.name == kwargs['role_id'])\
-			.filter(db.Password.key == sha.new(kwargs['key'].hexdigest())\
+			.filter(db.Password.key == sha.new(kwargs['key'].hexdigest()))\
 			.first()
 
 def register_rp(*args, **kwargs):
-	rp = config.RolePassword()
+	rp = config.RolePass()
 	rp.rip = kwargs.get('role_id')
 	rp.key = sha.new(kwargs.get('key')).hexdigest()
 	try:
@@ -503,7 +503,7 @@ def get_rolelink(*args, **kwargs):
 	if kwargs.get('role_id'):
 		return dbsession.query(db.RoleLink)\
 				.filter(db.RoleLink.rp == kwargs.get('rp_id'))\
-				.filter(db.RoleLink.role == kwargs.get('role_id'))
+				.filter(db.RoleLink.role == kwargs.get('role_id'))\
 				.first()
 	else:
 		return dbsession.query(db.RoleLink)\
@@ -550,7 +550,7 @@ def get_rolefollow(*args, **kwargs):
 	if kwargs.get('role_id') and kwargs.get('rp_id'):
 		return dbsession.query(db.RoleFollow)\
 				.filter(db.RoleFollow.rp == kwargs.get('rp_id'))\
-				.filter(db.RoleFollow.role == kwargs.get('role_id'))
+				.filter(db.RoleFollow.role == kwargs.get('role_id'))\
 				.first()
 	elif kwargs.get('rp_id'):
 		return dbsession.query(db.RoleFollow)\
@@ -560,7 +560,7 @@ def get_rolefollow(*args, **kwargs):
 		return dbsession.query(db.RoleFollow)\
 				.filter(db.RoleFollow.role == kwargs.get('role_id'))\
 				.all()
-	else
+	else:
 		return False
 
 def register_rolefollow(*args, **kwargs):
@@ -603,7 +603,7 @@ def get_roleblock(*args, **kwargs):
 	if kwargs.get('role_id') and kwargs.get('blocked_role_id'):
 		return dbsession.query(db.RoleBlock)\
 				.filter(db.RoleBlock.role == kwargs.get('role_id'))\
-				.filter(db.RoleBlock.blocked_role == kwargs.get('blocked_role_id'))
+				.filter(db.RoleBlock.blocked_role == kwargs.get('blocked_role_id'))\
 				.first()
 	elif kwargs.get('role_id'):
 		return dbsession.query(db.RoleBlock)\
@@ -613,7 +613,7 @@ def get_roleblock(*args, **kwargs):
 		return dbsession.query(db.RoleBlock)\
 				.filter(db.RoleBlock.role == kwargs.get('blocked_role_id'))\
 				.all()
-	else
+	else:
 		return False
 
 def register_roleblock(*args, **kwargs):
@@ -705,7 +705,7 @@ def get_groupmanager(*args, **kwargs):
 	if group_id and manager_rp:
 		return dbsession.query(db.GroupManager)\
 				.filter(db.GroupManager.group_id == group_id)\
-				.filter(db.GroupManager.manager_rp == manager_rp)
+				.filter(db.GroupManager.manager_rp == manager_rp)\
 				.first()
 	elif group_id:
 		return dbsession.query(db.GroupManager)\
@@ -715,7 +715,7 @@ def get_groupmanager(*args, **kwargs):
 		return dbsession.query(db.GroupManager)\
 				.filter(db.GroupManager.manager_rp == manager_rp)\
 				.all()
-	else
+	else:
 		return False
 
 def register_groupmanager(*args, **kwargs):
@@ -779,7 +779,7 @@ def get_groupjoiner(*args, **kwargs):
 	if group_id and joiner_rp:
 		return dbsession.query(db.GroupJoiner)\
 				.filter(db.GroupJoiner.group_id == group_id)\
-				.filter(db.GroupJoiner.joiner_rp == joiner_rp)
+				.filter(db.GroupJoiner.joiner_rp == joiner_rp)\
 				.first()
 	elif group_id:
 		return dbsession.query(db.GroupJoiner)\
@@ -789,7 +789,7 @@ def get_groupjoiner(*args, **kwargs):
 		return dbsession.query(db.GroupJoiner)\
 				.filter(db.GroupJoiner.joiner_rp == joiner_rp)\
 				.all()
-	else
+	else:
 		return False
 
 def register_groupjoiner(*args, **kwargs):
