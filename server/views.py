@@ -78,11 +78,13 @@ def homepage():
 	form = forms.HomeForm()
 	form.rpid = session.get('rpid')
 	form.role = dbh.get_role_by_rp(form.rpid)
-	form.profile = dbh.get_profile(form.rpid)
-	form.links = dbh.get_rolelink(form.rpid)
-	form.follows = dbh.get_rolefollow(form.rpid)
-	form.blocks = dbh.get_roleblock(form.rpid)
+	for l in dbh.get_rolelink(rp_id=form.rpid):
+		form.links.append(dbh.get_role_by_id(l.linked_role))
+	for f in dbh.get_rolefollow(rp_id=form.rpid):
+		form.follows.append(dbh.get_role_by_rp(f.down_rp))
+	for b in dbh.get_roleblock(role_id=form.role.id):
+		form.blocks = dbh.get_role_by_id(b.blocked_role_id)
 	form.groupm = dbh.get_groupmanager(manager_rp=form.rpid)
-	form.groupj = dbh.get_groupmanager(joiner_rp=form.rpid)
+	form.groupj = dbh.get_groupjoiner(joiner_rp=form.rpid)
 
 	return render_template('homepage.html', form=form)

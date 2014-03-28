@@ -17,9 +17,13 @@ class Role(Base):
 	__tablename__ = 'role'
 	id = Column(Integer, primary_key=True)
 	name = Column(String(50), nullable=False, unique=True)
+	email = Column(String(100), nullable=False)
+	gender = Column(Integer, default=2) # 0:woman, 1:man, 2:secret
+	location = Column(String(100))
+	update_time = Column(DateTime, default=func.now())
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
-	
+
 	rp = relationship('RolePass', cascade='all,delete-orphan', backref='role')
 	rl = relationship('RoleLink', cascade='all,delete-orphan', backref='role')
 	rf = relationship('RoleFollow', cascade='all,delete-orphan', backref='role')
@@ -30,11 +34,11 @@ class RolePass(Base):
 	id = Column(Integer, primary_key=True)
 	rid = Column(Integer, ForeignKey('role.id'))
 	key = Column(String(20), nullable=False)
+	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:group, 2:self
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 
 	login = relationship('Login', cascade='all,delete-orphan')
-	profile = relationship('Login', uselist=False, cascade='all,delete-orphan')
 	group = relationship('Group', cascade='all,delete-orphan')
 	gm = relationship('GroupManager', cascade='all,delete-orphan')
 	gj = relationship('GroupJoiner', cascade='all,delete-orphan')
@@ -45,16 +49,6 @@ class Login(Base):
 	rp = Column(Integer, ForeignKey('role_pass.id'))
 	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
 	update_time = Column(DateTime, default=func.now())	
-
-class Profile(Base):
-	__tablename__ = 'profile'
-	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_pass.id'))
-	email = Column(String(100), nullable=False)
-	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:group, 2:self
-	gender = Column(Integer, default=2) # 0:woman, 1:man, 2:secret
-	location = Column(String(100))
-	update_time = Column(DateTime, default=func.now())
 
 # RoleLink is for one person.
 # rp is center, and roles are linked to rp.

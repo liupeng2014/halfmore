@@ -6,11 +6,11 @@ from sqlalchemy import exc
 from server import db, dbsession, logger
 
 '''
-r1: hm_own
+r1: hmown
 r1p1: public
 r1p2: group
 r1p3: private
-r2: hm_work
+r2: hmwork
 r2p1: public
 r2p2: group
 r2p3: private
@@ -28,7 +28,10 @@ def db_insert_default(session):
 		.filter(db.Role.name == 'hm_own').first()
 	if r1 is None:
 		r1 = db.Role()
-		r1.name = 'hm_own'
+		r1.name = 'hmown'
+		r1.email = 'hmown@gmail.com'
+		r1.gender = 1
+		r1.location = "Tokyo,Japan"
 		try:
 			session.add(r1)
 			session.commit()
@@ -40,12 +43,15 @@ def db_insert_default(session):
 		r1p1 = db.RolePass()
 		r1p1.rid = r1.id
 		r1p1.key = sha.new('public').hexdigest()
+		r1p1.open_flag = 0
 		r1p2 = db.RolePass()
 		r1p2.rid = r1.id
 		r1p2.key = sha.new('group').hexdigest()
+		r1p2.open_flag = 1
 		r1p3 = db.RolePass()
 		r1p3.rid = r1.id
 		r1p3.key = sha.new('private').hexdigest()
+		r1p3.open_flag = 2
 		try:
 			session.add(r1p1)
 			session.add(r1p2)
@@ -56,41 +62,13 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:hm_own pass register failed.")
 			return False
 
-		prof11 = db.Profile()
-		prof11.rp = r1p1.id
-		prof11.email = 'hm_own_open@gmail.com'
-		prof11.open_flag = 0
-		prof11.gender = 1
-		prof11.location = "Tokyo,Japan"
-
-		prof12 = db.Profile()
-		prof12.rp = r1p2.id
-		prof12.email = 'hm_own_group@gmail.com'
-		prof12.open_flag = 1
-		prof12.gender = 1
-		prof12.location = "Yokohama,Japan"
-
-		prof13 = db.Profile()
-		prof13.rp = r1p3.id
-		prof13.email = 'hm_own_self@gmail.com'
-		prof13.open_flag = 2
-		prof13.gender = 1
-		prof13.location = "Beijing,China"
-		try:
-			session.add(prof11)
-			session.add(prof12)
-			session.add(prof13)
-			session.commit()
-		except exc.SQLAlchemyError:
-			session.rollback()
-			logger.info('%s', "DB_INIT:hm_own profile register failed.")
-			return False
-
 	if not session.query(db.Role)\
 		.filter(db.Role.name == 'hm_work').first():
 		r2 = db.Role()
 		r2.name = 'hm_work'
 		r2.email = 'hm_work@gmail.com'
+		r2.gender = 1
+		r1.location = "Tiba,Japan"
 		try:
 			session.add(r2)
 			session.commit()
@@ -102,48 +80,23 @@ def db_insert_default(session):
 		r2p1 = db.RolePass()
 		r2p1.rid = r2.id
 		r2p1.key = sha.new('public').hexdigest()
+		r2p1.open_flag = 0
 		r2p2 = db.RolePass()
 		r2p2.rid = r2.id
 		r2p2.key = sha.new('group').hexdigest()
+		r2p2.open_flag = 1
 		r2p3 = db.RolePass()
 		r2p3.rid = r2.id
 		r2p3.key = sha.new('private').hexdigest()
+		r2p3.open_flag = 2
 		try:
 			session.add(r2p1)
+			session.add(r2p2)
+			session.add(r2p3)
 			session.commit()
 		except exc.SQLAlchemyError:
 			session.rollback()
 			logger.info('%s', "DB_INIT:hm_work pass register failed.")
-			return False
-
-		prof21 = db.Profile()
-		prof21.rp = r2p1.id
-		prof21.email = 'hm_work_open@gmail.com'
-		prof21.open_flag = 0
-		prof21.gender = 1
-		prof21.location = "Tiba,Japan"
-
-		prof22 = db.Profile()
-		prof22.rp = r2p2.id
-		prof22.email = 'hm_work_group@gmail.com'
-		prof22.open_flag = 1
-		prof22.gender = 1
-		prof22.location = "Tokyo,Japan"
-
-		prof23 = db.Profile()
-		prof23.rp = r2p3.id
-		prof23.email = 'hm_work_self@gmail.com'
-		prof23.open_flag = 2
-		prof23.gender = 1
-		prof23.location = "Tokyo,Japan"
-		try:
-			session.add(prof21)
-			session.add(prof22)
-			session.add(prof23)
-			session.commit()
-		except exc.SQLAlchemyError:
-			session.rollback()
-			logger.info('%s', "DB_INIT:hm_work profile register failed.")
 			return False
 
 		rl211 = db.RoleLink()
@@ -318,21 +271,23 @@ def db_insert_default(session):
 			logger.info('%s', "DB_INIT:gj2 register failed.")
 			return False
 
-def get_role_info_from_rp(rp_id=None):
+def get_role_by_rp(rp_id=None):
+	return dbsession.query(db.Role)\
+			.filter(db.RolePass.id == rp_id)\
+			.filter(db.Role.id == db.RolePass.rid)\
+			.first()
 
-def get_role(role_id=None):
+def get_role_by_id(role_id=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.id == role_id)\
 			.first()
 
-def get_role_by_rp(rp_id=None):
-	role = dbsession.query(db.Role)\
-		.filter(db.RolePass.rp == rp_id)\
-		.first()
-
 def register_role(*args, **kwargs):
 	role = config.Role()
 	role.name = kwargs.get('name')
+	role.email = kwargs.get('email')
+	role.gender = kwargs.get('gender')
+	role.location = kwargs.get('location')
 	try:
 		dbsession.add(role)
 		dbsession.commit()
@@ -347,6 +302,9 @@ def update_role(*args, **kwargs):
 		return False
 
 	role.name = kwargs.get('name', role.name)
+	role.email = kwargs.get('email', role.email)
+	role.gender = kwargs.get('gender', role.gender)
+	role.location = kwargs.get('location', role.location)
 	role.modify_time = datetime.now()
 	try:
 		dbsession.commit()
@@ -383,6 +341,7 @@ def register_rp(*args, **kwargs):
 	rp = config.RolePass()
 	rp.rip = kwargs.get('role_id')
 	rp.key = sha.new(kwargs.get('key')).hexdigest()
+	rp.open_flag = kwargs.get('open_flag')
 	try:
 		dbsession.add(rp)
 		dbsession.commit()
@@ -392,14 +351,14 @@ def register_rp(*args, **kwargs):
 		return False
 
 def update_rp(*args, **kwargs):
-	if kwargs.get('key') is None:
-		return False
-
 	rp = get_rp(**kwargs)
 	if rp is None:
 		return False
 
-	rp.key = sha.new(kwargs.get('key')).hexdigest()
+	if kwargs.get('key'):
+		rp.key = sha.new(kwargs.get('key')).hexdigest()
+	if kwargs.get('open_flag'):
+		rp.open_flag = kwargs.get('open_flag')
 	rp.modify_time = datetime.now()
 	try:
 		dbsession.commit()
@@ -459,10 +418,6 @@ def get_profile(rp_id=None):
 def register_profile(*args, **kwargs):
 	profile = config.Profile()
 	profile.rp = kwargs.get('rp_id')
-	profile.email = kwargs.get('email')
-	profile.open_flag = kwargs.get('open_flag')
-	profile.gender = kwargs.get('gender')
-	profile.location = kwargs.get('location')
 	try:
 		dbsession.add(profile)
 		dbsession.commit()
@@ -551,19 +506,19 @@ def delete_all_rolelink(rp_id=None):
 def get_rolefollow(*args, **kwargs):
 	if kwargs.get('role_id') and kwargs.get('rp_id'):
 		return dbsession.query(db.RoleFollow)\
-				.filter(db.RoleFollow.rp == kwargs.get('rp_id'))\
-				.filter(db.RoleFollow.role == kwargs.get('role_id'))\
+				.filter(db.RoleFollow.down_rp == kwargs.get('rp_id'))\
+				.filter(db.RoleFollow.up_role == kwargs.get('role_id'))\
 				.first()
 	elif kwargs.get('rp_id'):
 		return dbsession.query(db.RoleFollow)\
-				.filter(db.RoleFollow.rp == kwargs.get('rp_id'))\
+				.filter(db.RoleFollow.down_rp == kwargs.get('rp_id'))\
 				.all()
 	elif kwargs.get('role_id'):
 		return dbsession.query(db.RoleFollow)\
-				.filter(db.RoleFollow.role == kwargs.get('role_id'))\
+				.filter(db.RoleFollow.up_role == kwargs.get('role_id'))\
 				.all()
 	else:
-		return False
+		return None
 
 def register_rolefollow(*args, **kwargs):
 	rf = config.RoleFollow()
@@ -616,7 +571,7 @@ def get_roleblock(*args, **kwargs):
 				.filter(db.RoleBlock.role == kwargs.get('blocked_role_id'))\
 				.all()
 	else:
-		return False
+		return None
 
 def register_roleblock(*args, **kwargs):
 	rb = config.RoleBlock()
