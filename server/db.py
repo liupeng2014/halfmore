@@ -35,20 +35,15 @@ class RolePass(Base):
 	rid = Column(Integer, ForeignKey('role.id'))
 	key = Column(String(20), nullable=False)
 	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:group, 2:self
+	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
+	last_login = Column(DateTime)
+	last_logout = Column(DateTime)
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 
-	login = relationship('Login', cascade='all,delete-orphan')
 	group = relationship('Group', cascade='all,delete-orphan')
 	gm = relationship('GroupManager', cascade='all,delete-orphan')
 	gj = relationship('GroupJoiner', cascade='all,delete-orphan')
-
-class Login(Base):
-	__tablename__ = 'login'
-	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_pass.id'))
-	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
-	update_time = Column(DateTime, default=func.now())	
 
 # RoleLink is for one person.
 # rp is center, and roles are linked to rp.
@@ -70,13 +65,10 @@ class RoleFollow(Base):
 
 class RoleBlock(Base):
 	__tablename__ = 'role_block'
-	__table_args__ = (UniqueConstraint('blocker_role_id', 'blocked_role_id'),)
+	__table_args__ = (UniqueConstraint('rp', 'blocked_role'),)
 	id = Column(Integer, primary_key=True)
-	blocker_role_id = Column(Integer, ForeignKey('role.id'))
-	blocked_role_id = Column(Integer, ForeignKey('role.id'))
-
-	blocker_role = relationship('Role', foreign_keys=[blocker_role_id])
-	blocked_role = relationship('Role', foreign_keys=[blocked_role_id])
+	rp = Column(Integer, ForeignKey('role_pass.id'))
+	blocked_role = Column(Integer, ForeignKey('role.id'))
 
 class Group(Base):
 	__tablename__ = 'group'
@@ -108,15 +100,12 @@ class GroupJoiner(Base):
 	group_id = Column(Integer, ForeignKey('group.id'))
 	joiner_rp = Column(Integer, ForeignKey('role_pass.id'))
 
+
 class Input(Base):
 	__tablename__ = 'input'
 	id = Column(Integer, primary_key=True)
 	# 0:short_message, 1:long_message, 2: comment, 3:schedule, 4:trade
 	type = Column(Integer, nullable=False)
-	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
-	group_id = Column(Integer, ForeignKey('group.id'))
-	create_time = Column(DateTime, default=func.now())
-	update_time = Column(DateTime, default=func.now())
 
 	short_message = relationship('ShortMessage', cascade='all,delete-orphan')
 	long_message = relationship('LongMessage', cascade='all,delete-orphan')
@@ -131,7 +120,7 @@ class ShortMessage(Base):
 	__tablename__ = 'short_message'
 	id = Column(Integer, primary_key=True)
 	input_id = Column(Integer, ForeignKey('input.id'))
-	text = Column(String(200))
+	text = Column(String(200), nullable=False)
 	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
@@ -141,8 +130,8 @@ class LongMessage(Base):
 	__tablename__ = 'long_message'
 	id = Column(Integer, primary_key=True)
 	input_id = Column(Integer, ForeignKey('input.id'))
-	title = Column(String(100))
-	text = Column(String(2000))
+	title = Column(String(100), nullable=False)
+	text = Column(String(2000), nullable=False)
 	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
@@ -153,7 +142,7 @@ class Comment(Base):
 	id = Column(Integer, primary_key=True)
 	input_id = Column(Integer, ForeignKey('input.id'))
 	parent_id = Column(Integer, ForeignKey('input.id'), nullable=False)
-	text = Column(String(2000))
+	text = Column(String(2000), nullable=False)
 	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
 	group_id = Column(Integer, ForeignKey('group.id'))
 	create_time = Column(DateTime, default=func.now())
