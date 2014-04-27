@@ -48,11 +48,26 @@
 				<td colspan="5" height="10"></td>
 			</tr>
 			<tr>
-				<td colspan="5" height="10">rpid={{ form.rpid }}</td>
+				<td colspan="5" height="10">rpid={{ form.rp.id }} roleid={{ form.role.id }}</td>
 			</tr>
-			{% for link in form.links %}
+			{% for l in form.links %}
 			<tr>
-				<td colspan="5" height="10">linked_role={{ link.linked_role }}</td>
+				<td colspan="5" height="10">linked_role={{ l.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for u in form.ups %}
+			<tr>
+				<td colspan="5" height="10">up_role={{ u.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for f in form.follows %}
+			<tr>
+				<td colspan="5" height="10">follow={{ f.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for b in form.blocks %}
+			<tr>
+				<td colspan="5" height="10">block={{ b.name }}</td>
 			</tr>
 			{% endfor %}
 			<tr>

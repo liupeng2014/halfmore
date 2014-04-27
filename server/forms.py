@@ -31,7 +31,15 @@ class LoginForm(Form):
 		return True		
 
 class HomeForm(Form):
-	pass
+	def __init__(self):
+		self.rp = None
+		self.role = None
+		self.links = []
+		self.ups = []
+		self.follows = []
+		self.blocks = []
+		self.groupm = None
+		self.groupj = None
 
 class RoleRegisterForm(Form):
 	userid = None

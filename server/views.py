@@ -15,7 +15,7 @@ from server import dbhandler as dbh
 def checkSession():
 	if session.get('operation') is not None:
 		session.pop('operation', None)
-	if session.get('rpid') is None:
+	if session.get('rp') is None:
 		return False
 	return True
 
@@ -38,17 +38,12 @@ def index():
 def login():
 	form = forms.LoginForm()
 
-	print "liu1"
 	if request.method == 'POST' and form.validate():
-		print "liu2"
 		rp = dbh.get_rp(role_name=form.rolename.data, key=form.password.data)
-		print "liu3"
 		if rp:
 			role = dbh.get_role_by_rp(rp.id)
-			print "liu4"
-			session['rp'] = json.dumps(rp)
-			session['role'] = json.dumps(role)
-#			LOG('login')
+			session['rp'] = json.dumps(rp.serialize)
+			session['role'] = json.dumps(role.serialize)
 			return redirect(url_for('homepage'))
 		else:
 			flash(u"Wrong rolename or password.")
@@ -63,12 +58,6 @@ def logout():
 	session.pop('rolename', None)
 	if session.get('operation') is not None:
 		session.pop('operation', None)
-	if session.get('networkname') is not None:
-		session.pop('networkname', None)
-	if session.get('networkid') is not None:
-		session.pop('networkid', None)
-	if session.get('logtype') is not None:
-		session.pop('logtype', None)
 
 	form = forms.LoginForm()
 	return render_template('login.html', form=form)
@@ -82,13 +71,16 @@ def homepage():
 	form = forms.HomeForm()
 	form.rp = json.loads(session.get('rp'))
 	form.role = json.loads(session.get('role'))
-	for l in dbh.get_rolelink(rp_id=form.rp.id):
+	for l in dbh.get_rolelink(rp_id=int(form.rp.get('id'))):
 		form.links.append(dbh.get_role_by_id(l.linked_role))
-	for f in dbh.get_rolefollow(rp_id=form.rp.id):
-		form.follows.append(dbh.get_role_by_rp(f.down_rp))
-	for b in dbh.get_roleblock(role_id=form.role.id):
-		form.blocks = dbh.get_role_by_id(b.blocked_role)
-	form.groupm = dbh.get_groupmanager(manager_rp=form.rpid)
-	form.groupj = dbh.get_groupjoiner(joiner_rp=form.rpid)
-
+	# get up_role
+	for fu in dbh.get_rolefollow(rp_id=int(form.rp.get('id'))):
+		form.ups.append(dbh.get_role_by_id(fu.up_role))
+	# get followers
+	for fd in dbh.get_rolefollow(role_id=int(form.rp.get('rid'))):
+		form.follows.append(dbh.get_role_by_rp(fd.down_rp))
+	for b in dbh.get_roleblock(role_id=int(form.role.get('id'))):
+		form.blocks.append(dbh.get_role_by_id(b.blocked_role))
+	form.groupm = dbh.get_groupmanager(manager_rp=int(form.rp.get('id')))
+	form.groupj = dbh.get_groupjoiner(joiner_rp=int(form.rp.get('id')))
 	return render_template('homepage.html', form=form)

@@ -13,6 +13,11 @@ def db_init(*args, **kwargs):
 	Base.metadata.create_all(engine)
 	return sessionmaker(bind=engine)()
 
+def dump_datetime(value):
+	if value is None:
+		return None
+	return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+
 class Role(Base):
 	__tablename__ = 'role'
 	id = Column(Integer, primary_key=True)
@@ -27,6 +32,19 @@ class Role(Base):
 	rp = relationship('RolePass', cascade='all,delete-orphan', backref='role')
 	rl = relationship('RoleLink', cascade='all,delete-orphan', backref='role')
 	rf = relationship('RoleFollow', cascade='all,delete-orphan', backref='role')
+
+	@property
+	def serialize(self):
+		return {
+			'id': str(self.id),
+			'name': self.name,
+			'email': self.email,
+			'gender': str(self.gender),
+			'location': self.location,
+			'update_time': dump_datetime(self.update_time),
+			'create_time': dump_datetime(self.create_time),
+			'modify_time': dump_datetime(self.modify_time)
+		}
 
 class RolePass(Base):
 	__tablename__ = 'role_pass'
@@ -45,6 +63,20 @@ class RolePass(Base):
 	gm = relationship('GroupManager', cascade='all,delete-orphan')
 	gj = relationship('GroupJoiner', cascade='all,delete-orphan')
 
+	@property
+	def serialize(self):
+	    return {
+	    	'id': str(self.id),
+	    	'rid': str(self.rid),
+	    	'key': self.key,
+	    	'open_flag': str(self.open_flag),
+	    	'status': str(self.status),
+	    	'last_login': dump_datetime(self.last_login),
+	    	'last_logout': dump_datetime(self.last_logout),
+	    	'create_time': dump_datetime(self.create_time),
+	    	'modify_time': dump_datetime(self.modify_time)
+	    }
+	
 # RoleLink is for one person.
 # rp is center, and roles are linked to rp.
 class RoleLink(Base):
