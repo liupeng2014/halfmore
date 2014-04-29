@@ -1,77 +1,69 @@
-{% extends "base.html" %}
-{% block title %}Homepage{% endblock %}
-{% block width %}600{% endblock %}
-{% block height %}50{% endblock %}
-{% block header %}
+<html>
+<header>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../static/css/common.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../static/js/common.js"></script>
+<title>{form.current_role.name} - HalfMore</title>
+</header>
+<body>
+<div id="container" style="width:800px;">
+	<div id="header">
 		<table bgcolor="#00BFFF">
 			<tr valign="bottom">
-				<td width="150" valign="top" align="left">
-					LOGO
+				<td width="100" valign="top" align="left">
+					HalfMore
 				</td>
-				<td width="350" align="center">
-					<font size="5">Homepage</font>
+				<td width="200" align="center">
+					<input type="text" size="5" name="search">
+					<input type="button" name="search" onclick="location.href='/search'" value="SEARCH" class="navibtn"/>
+				</td>
+				<td width="200" align="center">
+					<font size="3">RoleName</font><input type="text" size="5" name="rolename">
+				</td>
+				<td width="200" align="center">
+					<font size="3">RolePass</font><input type="password" size="5" name="rolepass">
 				</td>
 				<td width="100" align="center">
-					<input type="button" name="logout" onclick="location.href='/logout'" value="logout" class="navibtn"/>
+					<input type="button" name="login" onclick="location.href='/login'" value="LOGIN" class="navibtn"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" align="left">
+					<font size="5">{form.current_role.name}</font>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" height="20">
 				</td>
 			</tr>
 		</table>
-{% endblock %}
-{% block content %}
-		<table bgcolor="#00BFFF">
+	</div>
+	<div id="navi">
+		<table>
 			<tr>
-				<td colspan="5" height="30"></td>
-			</tr>
-			<tr>
-				<td width="45" height="20">
+				<td width="200" align="center">
+					<a href="/mine" id="mine">mine</a>
 				</td>
-				<td width="250" height="20" bgcolor="#FFFF00" align="center">
-					{% if session.role == 1 %}
-					<a href="/user_register">ユーザ登録</a>
-					{% else %}
-					<a href="/user_update">パスワード更新</a>
-					{% endif %}
+				<td width="200" align="center">
+					<a href="/group" id="group">group</a>
 				</td>
-				<td width="10" height="20">
+				<td width="200" align="center">
+					<a href="/tool" id="tool">tool</a>
 				</td>
-				<td width="250" height="20" bgcolor="#FFFF00" align="center">
-					{% if session.role == 1 %}
-					<a href="/user_list">ユーザ参照</a>
-					{% else %}
-					<a href="/device_list">デバイス参照</a>
-					{% endif %}
+				<td width="200" align="center">
 				</td>
-				<td width="45" height="20">
-				</td>
-			</tr>
-			<tr>
-				<td colspan="5" height="10"></td>
-			</tr>
-			<tr>
-				<td colspan="5" height="10">rpid={{ form.rp.id }} roleid={{ form.role.id }}</td>
-			</tr>
-			{% for l in form.links %}
-			<tr>
-				<td colspan="5" height="10">linked_role={{ l.name }}</td>
-			</tr>
-			{% endfor %}
-			{% for u in form.ups %}
-			<tr>
-				<td colspan="5" height="10">up_role={{ u.name }}</td>
-			</tr>
-			{% endfor %}
-			{% for f in form.follows %}
-			<tr>
-				<td colspan="5" height="10">follow={{ f.name }}</td>
-			</tr>
-			{% endfor %}
-			{% for b in form.blocks %}
-			<tr>
-				<td colspan="5" height="10">block={{ b.name }}</td>
-			</tr>
-			{% endfor %}
-			<tr>
-				<td colspan="5" height="10">end</td>
 			</tr>
 		</table>
-{% endblock %}
+	</div>
+	<div id="main">
+		<div id="left">
+			<div><font size="10">LEFT</font></div>
+		</div>
+		<div id="right">
+			<div><font size="10">RIGHT</font></div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

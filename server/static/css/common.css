@@ -4,6 +4,16 @@
 	margin-right: auto;
 }
 
+#left
+{
+	float: left;
+}
+
+#right
+{
+	float: right;
+}
+
 table
 {
 	border: 0;

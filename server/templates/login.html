@@ -6,16 +6,16 @@
 			<td width="150" align="left">
 				<font size="5">HalfMore</font>
 			</td>
-			<td width="150" align="center">
+			<td width="100" align="center">
 			</td>
-			<td width="100" align="right">
+			<td width="150" align="right">
 				<font size="5">Login</font>
 			</td>
 		</tr>
 	</table>
 {% endblock %}
 {% block content %}
-	<table width="400" bgcolor="#00BFFF">
+	<table bgcolor="#00BFFF">
 		<form action="/login" method="post" name="login">
 		<tr>
 			<td colspan="2" height="20"></td>
@@ -62,3 +62,71 @@
 		</form>
 	</table>
 {% endblock %}
+
+
+		<table bgcolor="#00BFFF">
+			<tr>
+				<td colspan="5" height="30"></td>
+			</tr>
+			<tr>
+				<td width="45" height="20">
+				</td>
+				<td width="250" height="20" bgcolor="#FFFF00" align="center">
+					{% if session.role == 1 %}
+					<a href="/user_register">ユーザ登録</a>
+					{% else %}
+					<a href="/user_update">パスワード更新</a>
+					{% endif %}
+				</td>
+				<td width="10" height="20">
+				</td>
+				<td width="250" height="20" bgcolor="#FFFF00" align="center">
+					{% if session.role == 1 %}
+					<a href="/user_list">ユーザ参照</a>
+					{% else %}
+					<a href="/device_list">デバイス参照</a>
+					{% endif %}
+				</td>
+				<td width="45" height="20">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" height="10"></td>
+			</tr>
+			<tr>
+				<td colspan="5" height="10">rpid={{ form.rp.id }} roleid={{ form.role.id }}</td>
+			</tr>
+			{% for l in form.links %}
+			<tr>
+				<td colspan="5" height="10">linked_role={{ l.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for u in form.ups %}
+			<tr>
+				<td colspan="5" height="10">up_role={{ u.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for f in form.follows %}
+			<tr>
+				<td colspan="5" height="10">follow={{ f.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for b in form.blocks %}
+			<tr>
+				<td colspan="5" height="10">block={{ b.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for g in form.gm %}
+			<tr>
+				<td colspan="5" height="10">group_managed={{ g.name }}</td>
+			</tr>
+			{% endfor %}
+			{% for g in form.gj %}
+			<tr>
+				<td colspan="5" height="10">group_joined={{ g.name }}</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td colspan="5" height="10">end</td>
+			</tr>
+		</table>

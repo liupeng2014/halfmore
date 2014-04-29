@@ -32,7 +32,7 @@ def LOG(*args):
 def index():
 	form = forms.LoginForm()
 
-	return render_template('login.html', form=form)
+	return render_template('homepage.html', form=form)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -52,10 +52,8 @@ def login():
 
 @app.route('/logout', methods = ['GET', 'POST'])
 def logout():
-#	LOG('logout')
-
-	session.pop('rpid', None)
-	session.pop('rolename', None)
+	session.pop('rp', None)
+	session.pop('role', None)
 	if session.get('operation') is not None:
 		session.pop('operation', None)
 
@@ -81,6 +79,8 @@ def homepage():
 		form.follows.append(dbh.get_role_by_rp(fd.down_rp))
 	for b in dbh.get_roleblock(role_id=int(form.role.get('id'))):
 		form.blocks.append(dbh.get_role_by_id(b.blocked_role))
-	form.groupm = dbh.get_groupmanager(manager_rp=int(form.rp.get('id')))
-	form.groupj = dbh.get_groupjoiner(joiner_rp=int(form.rp.get('id')))
+	for g in dbh.get_groupmanager(manager_rp=int(form.rp.get('id'))):
+		form.gm.append(dbh.get_group_by_id(g.group_id))
+	for g in dbh.get_groupjoiner(joiner_rp=int(form.rp.get('id'))):
+		form.gj.append(dbh.get_group_by_id(g.group_id))
 	return render_template('homepage.html', form=form)

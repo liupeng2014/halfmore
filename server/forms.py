@@ -38,8 +38,8 @@ class HomeForm(Form):
 		self.ups = []
 		self.follows = []
 		self.blocks = []
-		self.groupm = None
-		self.groupj = None
+		self.gm = []
+		self.gj = []
 
 class RoleRegisterForm(Form):
 	userid = None
