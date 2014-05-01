@@ -2,9 +2,8 @@
 <header>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="../static/css/common.css">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../static/js/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="../static/js/common.js"></script>
-<title>{form.current_role.name} - HalfMore</title>
 </header>
 <body>
 <div id="container" style="width:800px;">
@@ -12,12 +11,15 @@
 		<table bgcolor="#00BFFF">
 			<tr valign="bottom">
 				<td width="100" valign="top" align="left">
-					HalfMore
+					<font size="3">HalfMore</font>
 				</td>
+				<form id="search" method="post">
 				<td width="200" align="center">
 					<input type="text" size="5" name="search">
-					<input type="button" name="search" onclick="location.href='/search'" value="SEARCH" class="navibtn"/>
+					<input type="button" name="search" onclick="search()" value="SEARCH" class="navibtn"/>
 				</td>
+				</form>
+				<form id="login" method="post">
 				<td width="200" align="center">
 					<font size="3">RoleName</font><input type="text" size="5" name="rolename">
 				</td>
@@ -25,8 +27,9 @@
 					<font size="3">RolePass</font><input type="password" size="5" name="rolepass">
 				</td>
 				<td width="100" align="center">
-					<input type="button" name="login" onclick="location.href='/login'" value="LOGIN" class="navibtn"/>
+					<input type="button" name="login" onclick="login()" value="LOGIN" class="navibtn"/>
 				</td>
+				</form>
 			</tr>
 			<tr>
 				<td colspan="5" align="left">
@@ -57,10 +60,10 @@
 		</table>
 	</div>
 	<div id="main">
-		<div id="left">
+		<div id="left" width="50%">
 			<div><font size="10">LEFT</font></div>
 		</div>
-		<div id="right">
+		<div id="right" width="50%">
 			<div><font size="10">RIGHT</font></div>
 		</div>
 	</div>

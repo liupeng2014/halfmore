@@ -7,11 +7,13 @@
 #left
 {
 	float: left;
+	background-color: #FF0000;
 }
 
 #right
 {
 	float: right;
+	background-color: #00FF00;
 }
 
 table
