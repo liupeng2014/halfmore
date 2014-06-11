@@ -1,0 +1,45 @@
+<html>
+<header>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<script type="text/javascript" src="../static/js/jquery-1.11.0.min.js"></script>
+<style type="text/css">
+div{
+	position: absolute;
+}
+#personal{
+	top: 0px;
+	left: 0px;
+	width: 50px;
+	height: 300px;
+	color: #FFF;
+	background-color: #666;
+	text-align: center;
+}
+#role01{
+	top: 0px;
+	left: 50px;
+	width: 50px;
+	height: 300px;
+	color: #FFF;
+	background-color: #F90;	
+	text-align: center;
+}
+</style>
+<script type="text/javascript">
+$(function() {
+	$("#personal").click(function(event){
+		$("#personal").animate({left:"0px"});
+		$("#role01").animate({left:"50px"});
+	});
+	$("#role01").click(function(event){
+		$("#role01").animate({left:"0px"});
+		$("#personal").animate({left:"50px"});
+	});
+});
+</script>
+</header>
+<body>
+<div id="personal">Personal</div>
+<div id="role01">Role01</div>
+</body>
+</html>

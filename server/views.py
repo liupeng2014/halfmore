@@ -32,7 +32,7 @@ def LOG(*args):
 def index():
 	form = forms.LoginForm()
 
-	return render_template('homepage.html', form=form)
+	return render_template('halfmore.html', form=form)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
