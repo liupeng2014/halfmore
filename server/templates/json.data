@@ -1,0 +1,35 @@
+1. role info
+{
+	"role":{
+		"id":1,
+		"name":"a1",
+		"email":"a1@gmail.com",
+		"gender":1,
+		"location":"Tokyo,Japan",
+	}
+}
+
+2. role pass info
+{
+	"rolepass":{
+		"id":1,
+		"friends":[
+			{"name":"b1", "status":"on", "update":0},
+			{"name":"c1", "status":"busy", "update":1},
+			{"name":"d1", "status":"hide", "update":2},
+			{"name":"e1", "status":"off", "update":3}
+		],
+		"groups":[
+			{"name":"g1", "status":"open", "update":5},
+			{"name":"g2", "status":"block", "update":0},
+			{"name":"g3", "status":"close", "update":0},
+			{"name":"g4", "status":"open", "update":0}
+		],
+		"channels":[
+			{"name":"timeline", "update":5},
+			{"name":"news", "categary":[1,2,5,7], "update":100},
+			{"name":"twitter", "login":"aaa@gmail.com", "pass":"aaa", "update":10},
+			{"name":"facebook", "login":"aaa@gmail.com", "pass":"aaa", "update":20}
+		],
+	}
+}
