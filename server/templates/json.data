@@ -4,8 +4,6 @@
 		"id":1,
 		"name":"a1",
 		"email":"a1@gmail.com",
-		"gender":1,
-		"location":"Tokyo,Japan",
 	}
 }
 
@@ -13,6 +11,10 @@
 {
 	"rolepass":{
 		"id":1,
+		"name":"arp1",
+		"email":"a1@gmail.com",
+		"gender":1,
+		"location":"Tokyo,Japan",
 		"friends":[
 			{"name":"b1", "status":"on", "update":0},
 			{"name":"c1", "status":"busy", "update":1},

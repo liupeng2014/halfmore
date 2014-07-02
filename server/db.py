@@ -18,123 +18,111 @@ def dump_datetime(value):
 		return None
 	return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
-class Role(Base):
-	__tablename__ = 'role'
+class Account(Base):
+	__tablename__ = 'account'
 	id = Column(Integer, primary_key=True)
-	name = Column(String(50), nullable=False, unique=True)
-	email = Column(String(100), nullable=False)
-	gender = Column(Integer, default=2) # 0:woman, 1:man, 2:secret
-	location = Column(String(100))
+	name = Column(String(20), nullable=False, unique=True)
+	key = Column(String(64), nullable=False)
+	email = Column(String(200), nullable=False)
+	open = Column(Integer, nullable=False, default=0) 
+	# open description
+	# 0:open, 1:read, 2:self, 3:shut
+	# open: show OK, write OK, follow OK, apply OK, 
+	# read: show OK, write OK, follow OK, apply NG,
+	# self: show NG, write OK, follow NG, apply NG,
+	# shut: show NG, write NG, follow NG, apply NG,
+	location = Column(String(400))
 	update_time = Column(DateTime, default=func.now())
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 
-	rp = relationship('RolePass', cascade='all,delete-orphan', backref='role')
-	rl = relationship('RoleLink', cascade='all,delete-orphan', backref='role')
-	rf = relationship('RoleFollow', cascade='all,delete-orphan', backref='role')
+	role = relationship('Role', cascade='all,delete-orphan', backref='role')
 
 	@property
 	def serialize(self):
 		return {
 			'id': str(self.id),
 			'name': self.name,
+			'key': self.key,
 			'email': self.email,
-			'gender': str(self.gender),
+			'open': str(self.open),
 			'location': self.location,
 			'update_time': dump_datetime(self.update_time),
 			'create_time': dump_datetime(self.create_time),
 			'modify_time': dump_datetime(self.modify_time)
 		}
 
-class RolePass(Base):
-	__tablename__ = 'role_pass'
-	__table_args__ = (UniqueConstraint('rid','key'),)
+class Role(Base):
+	__tablename__ = 'role'
+	__table_args__ = (UniqueConstraint('account','name'),)
 	id = Column(Integer, primary_key=True)
-	rid = Column(Integer, ForeignKey('role.id'))
-	key = Column(String(20), nullable=False)
-	open_flag = Column(Integer, nullable=False, default=0) # 0:all, 1:group, 2:self
+	account = Column(Integer, ForeignKey('account.id'))
+	name = Column(String(20), nullable=False, unique=True)
+	key = Column(String(64), nullable=False)
+	is_manager = Column(Boolean, default=False)
+	area = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 2:self
 	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
+	email = Column(String(200), nullable=False)
+	gender = Column(Integer, default=0) # 0:secret, 1:woman, 2:man, 3:none
+	location = Column(String(400))
 	last_login = Column(DateTime)
 	last_logout = Column(DateTime)
 	create_time = Column(DateTime, default=func.now())
-	modify_time = Column(DateTime, default=func.now())
+	update_time = Column(DateTime, default=func.now())
 
-	hmgroup = relationship('HM_Group', cascade='all,delete-orphan')
-	gm = relationship('GroupManager', cascade='all,delete-orphan')
-	gj = relationship('GroupJoiner', cascade='all,delete-orphan')
+	rl = relationship('RoleLink', cascade='all,delete-orphan')
+	rf = relationship('RoleFollow', cascade='all,delete-orphan')
+	rb = relationship('RoleBlock', cascade='all,delete-orphan')
+	af = relationship('AccountFollow', cascade='all,delete-orphan')
 
 	@property
 	def serialize(self):
 	    return {
 	    	'id': str(self.id),
-	    	'rid': str(self.rid),
+	    	'account': str(self.rid),
+	    	'name': self.name,
 	    	'key': self.key,
-	    	'open_flag': str(self.open_flag),
+	    	'is_manager': str(self.is_manager),
+	    	'area': self.area,
 	    	'status': str(self.status),
+			'email': self.email,
+	    	'gender': str(self.gender),
+			'location': self.location,
 	    	'last_login': dump_datetime(self.last_login),
 	    	'last_logout': dump_datetime(self.last_logout),
 	    	'create_time': dump_datetime(self.create_time),
-	    	'modify_time': dump_datetime(self.modify_time)
+	    	'update_time': dump_datetime(self.update_time)
 	    }
 	
 # RoleLink is for one person.
-# rp is center, and roles are linked to rp.
 class RoleLink(Base):
 	__tablename__ = 'role_link'
-	__table_args__ = (UniqueConstraint('rp', 'linked_role'),)
+	__table_args__ = (UniqueConstraint('role', 'linker'),)
 	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_pass.id'))
-	linked_role = Column(Integer, ForeignKey('role.id'))
+	role = Column(Integer, ForeignKey('role.id'))
+	linker = Column(Integer, ForeignKey('role.id'))
 
-# RoleFollow if for two persons.
-# role is up, and rp follows role.
+# RoleFollow is for two persons.
 class RoleFollow(Base):
 	__tablename__ = 'role_follow'
-	__table_args__ = (UniqueConstraint('up_role', 'down_rp'),)
+	__table_args__ = (UniqueConstraint('role', 'follower'),)
 	id = Column(Integer, primary_key=True)
-	up_role = Column(Integer, ForeignKey('role.id'))
-	down_rp = Column(Integer, ForeignKey('role_pass.id'))
+	role = Column(Integer, ForeignKey('role.id'))
+	follower = Column(Integer, ForeignKey('role.id'))
 
 class RoleBlock(Base):
 	__tablename__ = 'role_block'
-	__table_args__ = (UniqueConstraint('rp', 'blocked_role'),)
+	__table_args__ = (UniqueConstraint('role', 'blocked'),)
 	id = Column(Integer, primary_key=True)
-	rp = Column(Integer, ForeignKey('role_pass.id'))
-	blocked_role = Column(Integer, ForeignKey('role.id'))
+	role = Column(Integer, ForeignKey('role.id'))
+	blocked = Column(Integer, ForeignKey('role.id'))
 
-class HM_Group(Base):
-	__tablename__ = 'hm_group'
+class AccountFollow(Base):
+	__tablename__ = 'account_follow'
+	__table_args__ = (UniqueConstraint('account', 'follower'),)
 	id = Column(Integer, primary_key=True)
-	name = Column(String(50), unique=True, nullable=False)
-	open_status = Column(Integer, nullable=False, default=0) # 0:all, 1:can search, 2:private
-	creater_rp = Column(Integer, ForeignKey('role_pass.id'))
-	create_time = Column(DateTime, default=func.now())
-	update_time = Column(DateTime, default=func.now())
-
-class GroupLink(Base):
-	__tablename__ = 'group_link'
-	__table_args__ = (UniqueConstraint('group_id', 'linked_group_id'),)
-	id = Column(Integer, primary_key=True)
-	group_id = Column(Integer, ForeignKey('hm_group.id'))
-	linked_group_id = Column(Integer, ForeignKey('hm_group.id'))
-
-	group = relationship('HM_Group', foreign_keys=[group_id])
-	linked_group = relationship('HM_Group', foreign_keys=[linked_group_id])
-
-class GroupManager(Base):
-	__tablename__ = 'group_manager'
-	__table_args__ = (UniqueConstraint('group_id', 'manager_rp'),)
-	id = Column(Integer, primary_key=True)
-	group_id = Column(Integer, ForeignKey('hm_group.id'))
-	manager_rp = Column(Integer, ForeignKey('role_pass.id'))
-
-class GroupJoiner(Base):
-	__tablename__ = 'group_joiner'
-	__table_args__ = (UniqueConstraint('group_id', 'joiner_rp'),)
-	id = Column(Integer, primary_key=True)
-	group_id = Column(Integer, ForeignKey('hm_group.id'))
-	joiner_rp = Column(Integer, ForeignKey('role_pass.id'))
-
+	account = Column(Integer, ForeignKey('account.id'))
+	follower = Column(Integer, ForeignKey('role.id'))
 
 class Input(Base):
 	__tablename__ = 'input'
