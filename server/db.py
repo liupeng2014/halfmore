@@ -31,12 +31,14 @@ class Account(Base):
 	# read: show OK, write OK, follow OK, apply NG,
 	# self: show NG, write OK, follow NG, apply NG,
 	# shut: show NG, write NG, follow NG, apply NG,
+	drive = Column(Integer, default=0) # drive value
 	location = Column(String(400))
 	update_time = Column(DateTime, default=func.now())
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 
 	role = relationship('Role', cascade='all,delete-orphan', backref='role')
+	af = relationship('AccountFollow', cascade='all,delete-orphan')
 
 	@property
 	def serialize(self):
@@ -60,10 +62,11 @@ class Role(Base):
 	name = Column(String(20), nullable=False, unique=True)
 	key = Column(String(64), nullable=False)
 	is_manager = Column(Boolean, default=False)
-	area = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 2:self
+	area = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 3:shut
 	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
 	email = Column(String(200), nullable=False)
 	gender = Column(Integer, default=0) # 0:secret, 1:woman, 2:man, 3:none
+	drive = Column(Integer, default=0) # drive value
 	location = Column(String(400))
 	last_login = Column(DateTime)
 	last_logout = Column(DateTime)
@@ -74,6 +77,7 @@ class Role(Base):
 	rf = relationship('RoleFollow', cascade='all,delete-orphan')
 	rb = relationship('RoleBlock', cascade='all,delete-orphan')
 	af = relationship('AccountFollow', cascade='all,delete-orphan')
+	input = relationship('Input', cascade='all,delete-orphan')
 
 	@property
 	def serialize(self):
@@ -127,49 +131,61 @@ class AccountFollow(Base):
 class Input(Base):
 	__tablename__ = 'input'
 	id = Column(Integer, primary_key=True)
-	# 0:short_message, 1:long_message, 2: comment, 3:schedule, 4:trade
+	# 0:short_message, 1:long_message, 2: comment, 3:event
 	type = Column(Integer, nullable=False)
+	mark = Column(Integer, default=0) # good mark
+	owner = Column(Integer, ForeignKey('role.id'), nullable=False)
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
 
 	short_message = relationship('ShortMessage', cascade='all,delete-orphan')
 	long_message = relationship('LongMessage', cascade='all,delete-orphan')
-
-class Media(Base):
-	__tablename__ = 'media'
-	id = Column(Integer, primary_key=True)
-	# 0:text 1:pic 2:video 3:audio
-	type = Column(Integer, nullable=False)
+	comment = relationship('Comment', cascade='all,delete-orphan')
 
 class ShortMessage(Base):
 	__tablename__ = 'short_message'
 	id = Column(Integer, primary_key=True)
-	input_id = Column(Integer, ForeignKey('input.id'))
+	input = Column(Integer, ForeignKey('input.id'))
 	text = Column(String(200), nullable=False)
-	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
-	group_id = Column(Integer, ForeignKey('hm_group.id'))
-	create_time = Column(DateTime, default=func.now())
-	update_time = Column(DateTime, default=func.now())
 
 class LongMessage(Base):
 	__tablename__ = 'long_message'
 	id = Column(Integer, primary_key=True)
-	input_id = Column(Integer, ForeignKey('input.id'))
+	input = Column(Integer, ForeignKey('input.id'))
 	title = Column(String(100), nullable=False)
 	text = Column(String(2000), nullable=False)
-	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
-	group_id = Column(Integer, ForeignKey('hm_group.id'))
-	create_time = Column(DateTime, default=func.now())
-	update_time = Column(DateTime, default=func.now())
 
 class Comment(Base):
 	__tablename__ = 'comment'
 	id = Column(Integer, primary_key=True)
-	input_id = Column(Integer, ForeignKey('input.id'))
-	parent_id = Column(Integer, ForeignKey('input.id'), nullable=False)
-	text = Column(String(2000), nullable=False)
-	create_rp = Column(Integer, ForeignKey('role_pass.id'), nullable=False)
-	group_id = Column(Integer, ForeignKey('hm_group.id'))
-	create_time = Column(DateTime, default=func.now())
-	update_time = Column(DateTime, default=func.now())
+	input = Column(Integer, ForeignKey('input.id'), nullable=False)
+	top = Column(Integer, ForeignKey('input.id'), nullable=False)
+	parent = Column(Integer, ForeignKey('input.id'), nullable=False)
+	text = Column(String(400), nullable=False)
 
-	input = relationship('Input', foreign_keys=[input_id])
-	parent = relationship('Input', foreign_keys=[parent_id])
+class Event(Base):
+	__tablename__ = 'event'
+	id = Column(Integer, primary_key=True)
+	input = Column(Integer, ForeignKey('input.id'), nullable=False)
+	title = Column(String(20), nullable=False, unique=True)
+	text = Column(String(200), nullable=False)
+	open = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 3:shut, 4:other
+	range = Column(String(500), nullable=True) # for open=4 add account or role
+	location = Column(String(400))
+	start_time = Column(DateTime, default=func.now(), nullable=False)
+	close_time = Column(DateTime, nullable=True)
+	repeat = Column(Integer, default=0) # 0:no, 1:day, 2:week, 3:month, 4:year, 5:minute
+	interval = Column(Integer, default=0) # for repeat=5 add minutes
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
+
+class Channel(Base):
+	__tablename__ = 'channel'
+	id = Column(Integer, primary_key=True)
+	input = Column(Integer, ForeignKey('input.id'), nullable=False)
+	title = Column(String(20), nullable=False, unique=True)
+	text = Column(String(200), nullable=False)
+	open = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 3:shut, 4:other
+	range = Column(String(500), nullable=True) # for open=4 add account or role
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
