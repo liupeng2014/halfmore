@@ -34,6 +34,12 @@ def index():
 
 	return render_template('halfmore.html', form=form)
 
+@app.route('/index')
+def index():
+	form = forms.LoginForm()
+
+	return render_template('index.html', form=form)
+
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
 	form = forms.LoginForm()
