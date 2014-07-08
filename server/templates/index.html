@@ -3,13 +3,84 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <script type="text/javascript" src="../static/js/jquery-1.11.0.min.js"></script>
 <style type="text/css">
+div{
+}
+#bg{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #00FF00;
+}
+#navi{
+	position: absolute;
+	top: 0px;
+	width: 1000px;
+	height: 30px;
+	background-color: #0000FF;
+	text-align: right;
+}
+#left{
+	position: absolute;
+	top: 30px;
+	width: 200px;
+	height: 300px;
+	background-color: #00FFFF;
+}
+#cm{
+	position: absolute;
+	top: 330px;
+	width: 200px;
+	height: 300px;
+	background-color: #FF00FF;
+}
+#right{
+	position: absolute;
+	top: 30px;
+	width: 800px;
+	background-color: #FFFF00;
+}
 </style>
 <script type="text/javascript">
+function setFrame() {
+	var w_width = window.innerWidth ? window.innerWidth : $(window).width();
+	var c_left = 0;
+	if (w_width > 1000) {
+		c_left = (w_width - 1000)/2;
+	}
+
+	var w_height = window.innerHeight ? window.innerHeight : $(window).height();
+	var c_height = w_height - 30;
+	if (w_height < 600) {
+		c_height = 600;
+	}
+
+	$("#bg").css("height", c_height+30);
+	$("#navi").text("c_left=" + c_left + ";w_width=" + w_width);
+	$("#navi").css("left", c_left);
+	$("#left").css("left", c_left);
+	$("#cm").css("left", c_left);
+	$("#right").css("left", c_left+200);
+	$("#right").css("height", c_height);
+	$("#right").text("c_height=" + c_height + ";w_height=" + w_height);
+}
+
+$(function(){
+	setFrame();
+});
+
+$(window).resize(function() {
+	setFrame();
+});
 </script>
 </header>
 <body>
-<div id="navi">Navi</div>
-<div id="left">left</div>
-<div id="right">right</div>
+<div id="bg">
+  <div id="navi">Navi</div>
+  <div id="left">left</div>
+  <div id="cm">cm</div>
+  <div id="right">right</div>
+</div>
 </body>
 </html>

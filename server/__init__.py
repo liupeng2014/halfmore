@@ -200,6 +200,6 @@ def db_insert_default(session):
 
 dbsession = db.db_init(cfg.get('database', 'url')+'?check_same_thread=False')
 import dbhandler as dbh
-db_insert_default(dbsession)
+#db_insert_default(dbsession)
 
 import views

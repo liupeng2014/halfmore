@@ -29,7 +29,7 @@ def LOG(*args):
 	logger.info('%s %s:%s', request.remote_addr, session.get('username'), message)
 
 @app.route('/')
-def index():
+def root():
 	form = forms.LoginForm()
 
 	return render_template('halfmore.html', form=form)
