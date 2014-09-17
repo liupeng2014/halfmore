@@ -3,8 +3,6 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <script type="text/javascript" src="../static/js/jquery-1.11.0.min.js"></script>
 <style type="text/css">
-div{
-}
 #bg{
 	position: absolute;
 	top: 0;
@@ -25,33 +23,59 @@ div{
 	position: absolute;
 	top: 30px;
 	width: 200px;
-	height: 300px;
+	height: 400px;
 	background-color: #00FFFF;
 }
 #cm{
 	position: absolute;
-	top: 330px;
+	top: 430px;
 	width: 200px;
-	height: 300px;
+	height: 200px;
 	background-color: #FF00FF;
+}
+#main{
+	position: absolute;
+	top: 30px;
+	width: 600px;
+	background-color: white;
 }
 #right{
 	position: absolute;
 	top: 30px;
-	width: 800px;
+	width: 200px;
 	background-color: #FFFF00;
 }
+#profile{
+	top: 30px;
+	width: 200px;
+	height: 310px;
+	background-color: #770000;
+}
+#rolelist{
+	top: 340px;
+	width: 200px;
+	height: 90px;
+	background-color: #770000;
+}
+div.role{
+	width: 200px;
+	height: 30px;
+	background-color: #007700;
+}
+
 </style>
 <script type="text/javascript">
+var w_width, w_height, c_left, c_height;
+
 function setFrame() {
-	var w_width = window.innerWidth ? window.innerWidth : $(window).width();
-	var c_left = 0;
+	w_width = window.innerWidth ? window.innerWidth : $(window).width();
+	c_left = 0;
 	if (w_width > 1000) {
 		c_left = (w_width - 1000)/2;
 	}
 
-	var w_height = window.innerHeight ? window.innerHeight : $(window).height();
-	var c_height = w_height - 30;
+	w_height = window.innerHeight ? window.innerHeight : $(window).height();
+	c_height = w_height - 30;
 	if (w_height < 600) {
 		c_height = 600;
 	}
@@ -61,24 +85,65 @@ function setFrame() {
 	$("#navi").css("left", c_left);
 	$("#left").css("left", c_left);
 	$("#cm").css("left", c_left);
-	$("#right").css("left", c_left+200);
+	$("#main").css("left", c_left+200);
+	$("#main").css("height", c_height);
+	$("#right").css("left", c_left+800);
 	$("#right").css("height", c_height);
 	$("#right").text("c_height=" + c_height + ";w_height=" + w_height);
 }
 
+var role_list = ["role1@hm", "role2@hm", "role3@hm"];
+
+function clickRole(role) {
+	var hit;
+
+	for (var i=0; i < role_list.length; i++) {
+		if (role.id == role_list[i]) {
+			if (i != 0) {
+				hit = role_list[i];
+				role_list[i] = role_list[0];
+				role_list[0] = hit;
+			}
+			break;
+		}
+	}
+
+	setRole();
+}
+
+function setRole() {
+	var role_top = 430;
+	var role_cnt = role_list.length;
+	$("#rolelist").html("");
+	for (var i = 0; i < role_cnt; i++) {
+		$("#rolelist").append("<div id='"+role_list[i]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+role_list[i]+"</div>");
+		role_top += 30;
+	}
+}
+
+function setLeft() {
+	$("#left").append("<div id='profile' class='profile' style='left:"+c_left+"'>profile</div>");
+
+	$("#left").append("<div id='rolelist' class='rolelist' style='left:"+c_left+"'>profile</div>");
+
+	setRole();
+}
+
 $(function(){
 	setFrame();
+	setLeft();
 });
 
 $(window).resize(function() {
 	setFrame();
 });
+
 </script>
 </header>
 <body>
 <div id="bg">
   <div id="navi">Navi</div>
-  <div id="left">left</div>
+  <div id="left"></div>
   <div id="cm">cm</div>
   <div id="right">right</div>
 </div>
