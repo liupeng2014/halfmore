@@ -6,7 +6,6 @@ import urllib
 import json
 import threading
 import logging
-import kazoo.exceptions
 from flask import Flask, session, render_template, redirect, url_for, request, jsonify, abort, flash
 
 from server import app, forms, logger

@@ -37,7 +37,6 @@
 	position: absolute;
 	top: 30px;
 	width: 600px;
-	background-color: white;
 }
 #right{
 	position: absolute;
@@ -62,7 +61,11 @@ div.role{
 	height: 30px;
 	background-color: #007700;
 }
-
+div.post{
+	width: 500px;
+	background-color: rgba(255,255,255,100);
+	margin : 5px;
+}
 </style>
 <script type="text/javascript">
 var w_width, w_height, c_left, c_height;
@@ -87,6 +90,7 @@ function setFrame() {
 	$("#cm").css("left", c_left);
 	$("#main").css("left", c_left+200);
 	$("#main").css("height", c_height);
+	$("#main").text("c_left=" + c_left+200);
 	$("#right").css("left", c_left+800);
 	$("#right").css("height", c_height);
 	$("#right").text("c_height=" + c_height + ";w_height=" + w_height);
@@ -129,9 +133,16 @@ function setLeft() {
 	setRole();
 }
 
+function setPost() {
+	$("#main").append("<div id='post01' class='post'>post01</div>");
+	$("#main").append("<div id='post02' class='post'>post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02</div>");
+	$("#main").append("<div id='post03' class='post'>理由は半角英数の連なりは1単語として判断されるから。理由は半角英数の連なりは1単語として判断されるから。</div>");
+}
+
 $(function(){
 	setFrame();
 	setLeft();
+	setPost();
 });
 
 $(window).resize(function() {
@@ -145,6 +156,7 @@ $(window).resize(function() {
   <div id="navi">Navi</div>
   <div id="left"></div>
   <div id="cm">cm</div>
+  <div id="main">main</div>
   <div id="right">right</div>
 </div>
 </body>
