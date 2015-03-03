@@ -103,7 +103,11 @@ def mod_role(*args, **kwargs):
 		return False
 
 	role.name = kwargs.get('name', role.name)
+	if (kwargs.get('name'))
+		role.key = hashlib.sha256(kwargs.get('key')).hexdigest()
 	role.email = kwargs.get('email', role.email)
+	role.open = kwargs.get('open', role.open)
+	role.status = kwargs.get('status', role.status)
 	role.gender = kwargs.get('gender', role.gender)
 	role.location = kwargs.get('location', role.location)
 	role.modify_time = datetime.now()

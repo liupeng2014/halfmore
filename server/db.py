@@ -80,29 +80,34 @@ class Role(Base):
 	    	'create_time': dump_datetime(self.create_time),
 	    	'update_time': dump_datetime(self.update_time)
 	    }
-	
-# RoleLink is for one person.
-class RoleLink(Base):
-	__tablename__ = 'role_link'
-	__table_args__ = (UniqueConstraint('role', 'linker'),)
-	id = Column(Integer, primary_key=True)
-	role = Column(Integer, ForeignKey('role.id'))
-	linker = Column(Integer, ForeignKey('role.id'))
 
-# RoleFollow is for two persons.
+class ActivityFollow(Base):
+	__tablename__ = 'activity_follow'
+	__table_args__ = (UniqueConstraint('follower', 'activity'),)
+	id = Column(Integer, primary_key=True)
+	follower = Column(Integer, ForeignKey('role.id'))
+	activity = Column(Integer, ForeignKey('activity.id'))
+
+class ActivityBlock(Base):
+	__tablename__ = 'activity_block'
+	__table_args__ = (UniqueConstraint('blocker', 'activity'),)
+	id = Column(Integer, primary_key=True)
+	blocker = Column(Integer, ForeignKey('role.id'))
+	activity = Column(Integer, ForeignKey('activity.id'))
+
 class RoleFollow(Base):
 	__tablename__ = 'role_follow'
-	__table_args__ = (UniqueConstraint('role', 'follower'),)
+	__table_args__ = (UniqueConstraint('follower', 'role'),)
 	id = Column(Integer, primary_key=True)
-	role = Column(Integer, ForeignKey('role.id'))
 	follower = Column(Integer, ForeignKey('role.id'))
+	role = Column(Integer, ForeignKey('role.id'))
 
 class RoleBlock(Base):
 	__tablename__ = 'role_block'
-	__table_args__ = (UniqueConstraint('role', 'blocked'),)
+	__table_args__ = (UniqueConstraint('blocker', 'role'),)
 	id = Column(Integer, primary_key=True)
+	blocker = Column(Integer, ForeignKey('role.id'))
 	role = Column(Integer, ForeignKey('role.id'))
-	blocked = Column(Integer, ForeignKey('role.id'))
 
 class Input(Base):
 	__tablename__ = 'input'
