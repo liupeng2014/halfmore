@@ -1,30 +1,92 @@
 # coding: utf-8
 
-import sha, datetime
+import datetime
+import hashlib
 from sqlalchemy import exc
 
 from server import db, dbsession, logger
 
-def get_role_by_rp(rp_id=None):
-	return dbsession.query(db.Role)\
-			.filter(db.RolePass.id == rp_id)\
-			.filter(db.Role.id == db.RolePass.rid)\
+def get_activity_by_id (id=None):
+	return dbsession.query(db.Activity)\
+			.filter(db.Activity.id == id)\
 			.first()
 
-def get_role_by_id(role_id=None):
+def get_activity_by_name (name=None):
+	return dbsession.query(db.Activity)\
+			.filter(db.Activity.name == name)\
+			.first()
+
+def add_activity(*args, **kwargs):
+	act = db.Activity()
+	act.name = kwargs.get('name')
+	try:
+		dbsession.add(act)
+		dbsession.commit()
+		return act
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def mod_activity(*args, **kwargs):
+	name = kwargs.get('act_name')
+	if (!name)
+		return False
+
+	if (kwargs.get('act_id'))
+		act = get_activity_by_id(kwargs.get('act_id'))
+	else
+		act = get_activity_by_name(name)
+	if act is None:
+		return False
+
+	if (name == act.name)
+		return False
+
+	act.name = name
+	act.modify_time = datetime.now()
+	try:
+		dbsession.commit()
+		return act
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def del_activity(*args, **kwargs):
+	if (kwargs.get('act_id'))
+		act = get_activity_by_id(kwargs.get('act_id'))
+	else if (kwargs.get('act_name'))
+		act = get_activity_by_name(kwargs.get('act_name'))
+	if role is None:
+		return False
+
+	try:
+		dbsession.delete(role)
+		dbsession.commit()
+		return role
+	except exc.SQLAlchemyError:
+		dbsession.rollback()
+		return False
+
+def get_role_by_id(act_id=None, role_id=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.id == role_id)\
+			.filter(db.Role.act_id == act_id)\
 			.first()
 
-def get_role_by_name(name=None):
+def get_role_by_name(act_name=None, role_name=None):
 	return dbsession.query(db.Role)\
-			.filter(db.Role.name == name)\
+			.filter(db.Role.name == role_name)\
+			.filter(db.Activity.name == act_name)\
 			.first()
 
-def register_role(*args, **kwargs):
+def add_role(*args, **kwargs):
 	role = db.Role()
+	role.act_id = kwargs.get('act_id')
 	role.name = kwargs.get('name')
+	role.key = hashlib.sha256(kwargs.get('key')).hexdigest()
 	role.email = kwargs.get('email')
+	role.open = kwargs.get('open')
+	role.status = kwargs.get('status')
 	role.gender = kwargs.get('gender')
 	role.location = kwargs.get('location')
 	try:
@@ -35,7 +97,7 @@ def register_role(*args, **kwargs):
 		dbsession.rollback()
 		return False
 
-def update_role(*args, **kwargs):
+def mod_role(*args, **kwargs):
 	role = get_role(kwargs.get('role_id'))
 	if role is None:
 		return False

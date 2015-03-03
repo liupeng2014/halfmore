@@ -94,6 +94,14 @@ function setFrame() {
 	$("#right").css("left", c_left+800);
 	$("#right").css("height", c_height);
 	$("#right").text("c_height=" + c_height + ";w_height=" + w_height);
+
+	var newaccount = document.createElement("input");
+	newaccount.type = "button";
+	newaccount.value = "new account";
+	newaccount.onclick = function() {
+		alert("new account");
+	}
+	document.getElementById("right").appendChild(newaccount);
 }
 
 var role_list = ["role1@hm", "role2@hm", "role3@hm"];

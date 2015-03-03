@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import sys, os, sha
+import sys, os
 import binascii
 import ConfigParser
 
