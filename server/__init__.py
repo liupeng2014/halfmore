@@ -23,7 +23,7 @@ app = Flask(__name__)
 app.csrf_enabled = True
 app.secret_key = os.urandom(24)
 logfile_handler = FileHandler(filename=cfg.get('web', 'logfile'))
-logfile_handler.setFormatter(Formatter('%(asctime)sZ %(message)s'))
+logfile_handler.setFormatter(Formatter('%(asctime)s-15s %(clientip)s %(user)-8s %(message)s'))
 logger = logging.getLogger('HMWebLog')
 logger.addHandler(logfile_handler)
 logger.setLevel(logging.DEBUG)
@@ -48,10 +48,29 @@ r4: friend2
 r4p1: friend2
 '''
 def db_insert_default(session):
-	r1 = dbh.register_role(name='hmown', email='hmown@gmail.com', gender=1, location='Tokyo,Japan')
-	if not r1:
-		logger.info('%s', "DB_INIT:role=hmown register failed.")
-		return False
+	ACT1_NAME = "act1"
+	ACT1_NAME = "act2"
+	R1_NAME = "role1"
+	R2_NAME = "role2"
+
+	if not dbh.get_activity_by_name(ACT1_NAME):
+		if not dbh.add_activity(name=ACT1_NAME):
+			logger.info("DB_INIT: activity=%s add failed.", ACT1_NAME)
+			return False
+
+	if not dbh.get_activity_by_name(ACT2_NAME):
+		if not dbh.add_activity(name=ACT2_NAME):
+			logger.info("DB_INIT: activity=%s add failed.", ACT2_NAME)
+			return False
+
+	if not dbh.get_role_by_id(ACT1_NAME, R1_NAME):
+		if not dbh.add_activity(act_name=ACT1_NAME,
+								role_name=R1_NAME,
+								key="hoge",
+								email="aaa@bbb.com",
+								open=0):
+			logger.info("DB_INIT: activity=%s add failed.", ACT1_NAME)
+			return False
 
 	r1p1 = dbh.register_rp(role_id=r1.id, key='public', open_flag=0)
 	if not r1p1:

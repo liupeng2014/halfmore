@@ -67,10 +67,9 @@ def del_activity(*args, **kwargs):
 		dbsession.rollback()
 		return False
 
-def get_role_by_id(act_id=None, role_id=None):
+def get_role_by_id(role_id=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.id == role_id)\
-			.filter(db.Role.act_id == act_id)\
 			.first()
 
 def get_role_by_name(act_name=None, role_name=None):
@@ -80,9 +79,27 @@ def get_role_by_name(act_name=None, role_name=None):
 			.first()
 
 def add_role(*args, **kwargs):
+	act_name = kwargs.get('act_name')
+	act_id = kwargs.get('act_id')
+	if act_name:
+		act = get_activity_by_name(act_name)
+		if act:
+			act_id = act.id
+		else:
+			act = add_activity(name=act_name)
+			if act:
+				act_id = act.id
+			else:
+				return -1
+	else if act_id:
+		if not get_activity_by_id(act_id):
+			return -2
+	else:
+		return -3
+
 	role = db.Role()
-	role.act_id = kwargs.get('act_id')
-	role.name = kwargs.get('name')
+	role.act_id = act_id
+	role.name = kwargs.get('role_name')
 	role.key = hashlib.sha256(kwargs.get('key')).hexdigest()
 	role.email = kwargs.get('email')
 	role.open = kwargs.get('open')
