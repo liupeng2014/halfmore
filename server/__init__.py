@@ -63,15 +63,43 @@ def db_insert_default(session):
 			logger.info("DB_INIT: activity=%s add failed.", ACT2_NAME)
 			return False
 
-	if not dbh.get_role_by_id(ACT1_NAME, R1_NAME):
-		if not dbh.add_activity(act_name=ACT1_NAME,
-								role_name=R1_NAME,
-								key="hoge",
-								email="aaa@bbb.com",
-								open=0):
-			logger.info("DB_INIT: activity=%s add failed.", ACT1_NAME)
+	if not dbh.get_role_by_name(ACT1_NAME, R1_NAME):
+		if not dbh.add_role(act_name=ACT1_NAME,
+							role_name=R1_NAME,
+							key="hoge",
+							email="aaa@AAA.com",
+							open=0, status=0, gender=0, location="Beijing"):
+			logger.info("DB_INIT: role=%s@%s add failed.", R1_NAME, ACT1_NAME)
 			return False
 
+	if not dbh.get_role_by_name(ACT1_NAME, R2_NAME):
+		if not dbh.add_role(act_name=ACT1_NAME,
+							role_name=R2_NAME,
+							key="hoge",
+							email="bbb@AAA.com",
+							open=1, status=0, gender=1, location="Yokohama"):
+			logger.info("DB_INIT: role=%s@%s add failed.", R2_NAME, ACT1_NAME)
+			return False
+
+	if not dbh.get_role_by_name(ACT2_NAME, R1_NAME):
+		if not dbh.add_role(act_name=ACT2_NAME,
+							role_name=R1_NAME,
+							key="hoge",
+							email="aaa@BBB.com",
+							open=2, status=0, gender=2, location="Tokyo"):
+			logger.info("DB_INIT: role=%s@%s add failed.", R1_NAME, ACT2_NAME)
+			return False
+
+	if not dbh.get_role_by_name(ACT2_NAME, R2_NAME):
+		if not dbh.add_role(act_name=ACT2_NAME,
+							role_name=R2_NAME,
+							key="hoge",
+							email="bbb@BBB.com",
+							open=3, status=0, gender=3, location="Tiba"):
+			logger.info("DB_INIT: role=%s@%s add failed.", R2_NAME, ACT2_NAME)
+			return False
+
+	'''
 	r1p1 = dbh.register_rp(role_id=r1.id, key='public', open_flag=0)
 	if not r1p1:
 		logger.info('%s', "DB_INIT:hmown p1 register failed.")
@@ -216,6 +244,7 @@ def db_insert_default(session):
 	if not gj241:
 		logger.info('%s', "DB_INIT:gj241 register failed.")
 		return False
+	'''
 
 dbsession = db.db_init(cfg.get('database', 'url')+'?check_same_thread=False')
 import dbhandler as dbh

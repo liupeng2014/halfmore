@@ -159,49 +159,6 @@ def get_rp(*args, **kwargs):
 			.filter(db.RolePass.key == sha.new(kwargs['key']).hexdigest())\
 			.first()
 
-def register_rp(*args, **kwargs):
-	rp = db.RolePass()
-	rp.rid = kwargs.get('role_id')
-	rp.key = sha.new(kwargs.get('key')).hexdigest()
-	rp.open_flag = kwargs.get('open_flag')
-	try:
-		dbsession.add(rp)
-		dbsession.commit()
-		return rp
-	except exc.SQLAlchemyError:
-		dbsession.rollback()
-		return False
-
-def update_rp(*args, **kwargs):
-	rp = get_rp(**kwargs)
-	if rp is None:
-		return False
-
-	if kwargs.get('key'):
-		rp.key = sha.new(kwargs.get('key')).hexdigest()
-	if kwargs.get('open_flag'):
-		rp.open_flag = kwargs.get('open_flag')
-	rp.modify_time = datetime.now()
-	try:
-		dbsession.commit()
-		return rp
-	except exc.SQLAlchemyError:
-		dbsession.rollback()
-		return False
-
-def delete_rp(rp_id=None):
-	rp = get_role(rp_id)
-	if rp is None:
-		return False
-
-	try:
-		dbsession.delete(rp)
-		dbsession.commit()
-		return rp
-	except exc.SQLAlchemyError:
-		dbsession.rollback()
-		return False
-
 """
 def get_login(rp_id=None):
 	return dbsession.query(db.Login)\

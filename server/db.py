@@ -51,7 +51,7 @@ class Role(Base):
 	# self: write OK, show for self, be followed NG
 	# shut: write NG, show NG, be followed NG
 	status = Column(Integer, nullable=False, default=0) # login status. 0:off, 1:on, 2:out
-	gender = Column(Integer, default=0) # 0:secret, 1:woman, 2:man, 3:none
+	gender = Column(Integer, default=0) # 0:secret, 1:female, 2:male, 3:none
 	location = Column(String(400))
 	last_login = Column(DateTime)
 	last_logout = Column(DateTime)
