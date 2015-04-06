@@ -7,17 +7,17 @@ from sqlalchemy import exc
 from server import db, dbsession, logger
 
 def get_activity_by_id (id=None):
-	return dbsession.query(db.Activity)\
-			.filter(db.Activity.id == id)\
+	return dbsession.query(db.Act)\
+			.filter(db.Act.id == id)\
 			.first()
 
 def get_activity_by_name (name=None):
-	return dbsession.query(db.Activity)\
-			.filter(db.Activity.name == name)\
+	return dbsession.query(db.Act)\
+			.filter(db.Act.name == name)\
 			.first()
 
 def add_activity(*args, **kwargs):
-	act = db.Activity()
+	act = db.Act()
 	act.name = kwargs.get('name')
 	try:
 		dbsession.add(act)
@@ -29,17 +29,17 @@ def add_activity(*args, **kwargs):
 
 def mod_activity(*args, **kwargs):
 	name = kwargs.get('act_name')
-	if (!name)
+	if name is None:
 		return False
 
-	if (kwargs.get('act_id'))
+	if (kwargs.get('act_id')):
 		act = get_activity_by_id(kwargs.get('act_id'))
-	else
+	else:
 		act = get_activity_by_name(name)
 	if act is None:
 		return False
 
-	if (name == act.name)
+	if (name == act.name):
 		return False
 
 	act.name = name
@@ -52,9 +52,9 @@ def mod_activity(*args, **kwargs):
 		return False
 
 def del_activity(*args, **kwargs):
-	if (kwargs.get('act_id'))
+	if (kwargs.get('act_id')):
 		act = get_activity_by_id(kwargs.get('act_id'))
-	else if (kwargs.get('act_name'))
+	elif (kwargs.get('act_name')):
 		act = get_activity_by_name(kwargs.get('act_name'))
 	if role is None:
 		return False
@@ -75,7 +75,7 @@ def get_role_by_id(role_id=None):
 def get_role_by_name(act_name=None, role_name=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.name == role_name)\
-			.filter(db.Activity.name == act_name)\
+			.filter(db.Act.name == act_name)\
 			.first()
 
 def add_role(*args, **kwargs):
@@ -91,7 +91,7 @@ def add_role(*args, **kwargs):
 				act_id = act.id
 			else:
 				return -1
-	else if act_id:
+	elif act_id:
 		if not get_activity_by_id(act_id):
 			return -2
 	else:
@@ -120,7 +120,7 @@ def mod_role(*args, **kwargs):
 		return False
 
 	role.name = kwargs.get('name', role.name)
-	if (kwargs.get('name'))
+	if (kwargs.get('name')):
 		role.key = hashlib.sha256(kwargs.get('key')).hexdigest()
 	role.email = kwargs.get('email', role.email)
 	role.open = kwargs.get('open', role.open)
@@ -148,15 +148,16 @@ def delete_role(role_id=None):
 		dbsession.rollback()
 		return False
 
-def get_rp(*args, **kwargs):
-	if kwargs.get('rp_id'):
-		return dbsession.query(db.RolePass)\
-			.filter(db.RolePass.id == kwargs['rp_id'])\
-			.first()
-	elif kwargs.get('role_name') and kwargs.get('key'):
-		return dbsession.query(db.RolePass)\
-			.filter(db.Role.name == kwargs['role_name'])\
-			.filter(db.RolePass.key == sha.new(kwargs['key']).hexdigest())\
+def check_role(*args, **kwargs):
+	if kwargs.get('act_name') is None or \
+		kwargs.get('role_name') is None or \
+		kwargs.get('key') is None:
+		return False
+	else:
+		return dbsession.query(db.Role)\
+			.filter(db.Act.name == kwargs.get('act_name'))\
+			.filter(db.Role.name == kwargs.get('role_name'))\
+			.filter(db.Role.key == kwargs.get('key'))\
 			.first()
 
 """

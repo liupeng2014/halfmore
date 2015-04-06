@@ -16,11 +16,16 @@ import rolepass as rp
 import dbhandler as dbh
 
 class LoginForm(Form):
-	rolename = TextField('role')
+	act = TextField('act')
+	role = TextField('role')
 	password = PasswordField('pass')
 
 	def validate(self):
-		if not self.rolename.data:
+		if not self.act.data:
+			flash(u'Act is required.')
+			return False
+
+		if not self.role.data:
 			flash(u'Role is required.')
 			return False
 

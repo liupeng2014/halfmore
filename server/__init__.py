@@ -23,11 +23,10 @@ app = Flask(__name__)
 app.csrf_enabled = True
 app.secret_key = os.urandom(24)
 logfile_handler = FileHandler(filename=cfg.get('web', 'logfile'))
-logfile_handler.setFormatter(Formatter('%(asctime)s-15s %(clientip)s %(user)-8s %(message)s'))
+logfile_handler.setFormatter(Formatter('%(asctime)s-15s %(name)s - %(levelname)s - %(message)s'))
 logger = logging.getLogger('HMWebLog')
 logger.addHandler(logfile_handler)
-logger.setLevel(logging.DEBUG)
-logger.info('%s', "=== HM web start ===")
+logger.debug('%s', "=== HM web start ===")
 
 '''
 r1: hmown

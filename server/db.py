@@ -18,8 +18,8 @@ def dump_datetime(value):
 		return None
 	return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
-class Activity(Base):
-	__tablename__ = 'activity'
+class Act(Base):
+	__tablename__ = 'act'
 	id = Column(Integer, primary_key=True)
 	name = Column(String(20), nullable=False, unique=True)
 	create_time = Column(DateTime, default=func.now())
@@ -37,9 +37,9 @@ class Activity(Base):
 
 class Role(Base):
 	__tablename__ = 'role'
-	__table_args__ = (UniqueConstraint('actid','name'),)
+	__table_args__ = (UniqueConstraint('act_id','name'),)
 	id = Column(Integer, primary_key=True)
-	act_id = Column(Integer, ForeignKey('activity.id'))
+	act_id = Column(Integer, ForeignKey('act.id'))
 	name = Column(String(20), nullable=False, unique=True)
 	key = Column(String(64), nullable=False)
 	email = Column(String(200), nullable=False)
@@ -58,7 +58,6 @@ class Role(Base):
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 
-	rl = relationship('RoleLink', cascade='all,delete-orphan')
 	rf = relationship('RoleFollow', cascade='all,delete-orphan')
 	rb = relationship('RoleBlock', cascade='all,delete-orphan')
 	input = relationship('Input', cascade='all,delete-orphan')
@@ -67,7 +66,7 @@ class Role(Base):
 	def serialize(self):
 	    return {
 	    	'id': str(self.id),
-	    	'activity': str(self.actid),
+	    	'act_id': str(self.actid),
 	    	'name': self.name,
 	    	'key': self.key,
 	    	'open': str(self.open),
@@ -81,19 +80,19 @@ class Role(Base):
 	    	'update_time': dump_datetime(self.update_time)
 	    }
 
-class ActivityFollow(Base):
-	__tablename__ = 'activity_follow'
-	__table_args__ = (UniqueConstraint('follower', 'activity'),)
+class ActFollow(Base):
+	__tablename__ = 'act_follow'
+	__table_args__ = (UniqueConstraint('follower', 'act'),)
 	id = Column(Integer, primary_key=True)
 	follower = Column(Integer, ForeignKey('role.id'))
-	activity = Column(Integer, ForeignKey('activity.id'))
+	act = Column(Integer, ForeignKey('act.id'))
 
-class ActivityBlock(Base):
-	__tablename__ = 'activity_block'
-	__table_args__ = (UniqueConstraint('blocker', 'activity'),)
+class ActBlock(Base):
+	__tablename__ = 'act_block'
+	__table_args__ = (UniqueConstraint('blocker', 'act'),)
 	id = Column(Integer, primary_key=True)
 	blocker = Column(Integer, ForeignKey('role.id'))
-	activity = Column(Integer, ForeignKey('activity.id'))
+	act = Column(Integer, ForeignKey('act.id'))
 
 class RoleFollow(Base):
 	__tablename__ = 'role_follow'

@@ -3,6 +3,16 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <script type="text/javascript" src="../static/js/jquery-1.11.0.min.js"></script>
 <style type="text/css">
+#grey{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: Grey;
+	opacity: 0.5;
+	display: none;
+}
 #bg{
 	position: absolute;
 	top: 0;
@@ -12,34 +22,42 @@
 	background-color: #00FF00;
 }
 #navi{
-	position: absolute;
+	position: fixed;
 	top: 0px;
 	width: 1000px;
 	height: 30px;
 	background-color: #0000FF;
 	text-align: right;
 }
+#create{
+	position: fixed;
+	top: 30px;
+	width: 1000px;
+	height: 300px;
+	background-color: #FFFFFF;
+	display: none;
+}
 #left{
-	position: absolute;
+	position: fixed;
 	top: 30px;
 	width: 200px;
 	height: 400px;
 	background-color: #00FFFF;
 }
 #cm{
-	position: absolute;
+	position: fixed;
 	top: 430px;
 	width: 200px;
 	height: 200px;
 	background-color: #FF00FF;
 }
 #main{
-	position: absolute;
+	position: fixed;
 	top: 30px;
 	width: 600px;
 }
 #right{
-	position: absolute;
+	position: fixed;
 	top: 30px;
 	width: 200px;
 	background-color: #FFFF00;
@@ -84,8 +102,8 @@ function setFrame() {
 	}
 
 	$("#bg").css("height", c_height+30);
-	$("#navi").text("c_left=" + c_left + ";w_width=" + w_width);
 	$("#navi").css("left", c_left);
+	$("#create").css("left", c_left);
 	$("#left").css("left", c_left);
 	$("#cm").css("left", c_left);
 	$("#main").css("left", c_left+200);
@@ -147,10 +165,46 @@ function setPost() {
 	$("#main").append("<div id='post03' class='post'>理由は半角英数の連なりは1単語として判断されるから。理由は半角英数の連なりは1単語として判断されるから。</div>");
 }
 
+function clickAddNew() {
+	document.getElementById("grey").style.display = "block";
+	document.getElementById("create").style.display = "block";
+}
+
+function clickCreate() {
+	document.getElementById("grey").style.display = "none";
+	document.getElementById("create").style.display = "none";
+}
+
+function loadNavi() {
+	document.getElementById("navi").innerHTML = "\
+		<table>\
+			<tr>\
+				<td>HalfMore LOGO</td>\
+				<td width='20px'></td>\
+				<td><input type='button' value='Add New' onclick='clickAddNew()'></td>\
+				<td width='20px'></td>\
+				<form action='/login' method='post' name='login'>\
+				<td><input type='text' name='act' size='10' maxlength='20'></td>\
+				<td>@</td>\
+				<td><input type='text' name='role' size='10' maxlength='20'></td>\
+				<td width='10px'></td>\
+				<td><input type='password' name='password' size='10' maxlength='20'></td>\
+				<td width='10px'></td>\
+				</form>\
+				<td><input type='button' value='Enter' onclick='document.login.submit()'></td>\
+				<td width='10px'></td>\
+				<td><input type='button' value='Exit'></td>\
+			</tr>\
+		</table>\
+	";
+}
+
 $(function(){
 	setFrame();
 	setLeft();
 	setPost();
+
+	loadNavi();
 });
 
 $(window).resize(function() {
@@ -161,11 +215,13 @@ $(window).resize(function() {
 </header>
 <body>
 <div id="bg">
-  <div id="navi">Navi</div>
+  <div id="navi"></div>
   <div id="left"></div>
   <div id="cm">cm</div>
   <div id="main">main</div>
   <div id="right">right</div>
 </div>
+<div id="grey"></div>
+<div id="create" onclick="clickCreate()"></div>
 </body>
 </html>
