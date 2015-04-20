@@ -29,31 +29,31 @@ def LOG(*args):
 
 @app.route('/')
 def root():
-	form = forms.LoginForm()
-
-	return render_template('halfmore.html', form=form)
+	return redirect(url_for('index'))
 
 @app.route('/index')
 def index():
 	form = forms.LoginForm()
 
+	session['role_info'] = "init"
 	return render_template('index.html', form=form)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
 	form = forms.LoginForm()
 
-	if request.method == 'POST' and form.validate():
-		rp = dbh.get_rp(role_name=form.rolename.data, key=form.password.data)
-		if rp:
-			role = dbh.get_role_by_rp(rp.id)
-			session['rp'] = json.dumps(rp.serialize)
-			session['role'] = json.dumps(role.serialize)
-			return redirect(url_for('homepage'))
+	if request.method == 'POST':
+		role = dbh.check_role(act_name=form.act.data,
+							role_name=form.role.data,
+							key=form.password.data)
+		if role:
+			session['role_info'] = json.dumps(rp.serialize)
+			return render_template('index.html', form=form)
 		else:
-			flash(u"Wrong rolename or password.")
+			session['role_info'] = "none"
+			return render_template('index.html', form=form)
 
-	return render_template('login.html', form=form)
+	return redirect(url_for('index'))
 
 @app.route('/logout', methods = ['GET', 'POST'])
 def logout():

@@ -16,9 +16,9 @@ import rolepass as rp
 import dbhandler as dbh
 
 class LoginForm(Form):
-	act = TextField('act')
-	role = TextField('role')
-	password = PasswordField('pass')
+	act = HiddenField('hdn_act')
+	role = HiddenField('hdn_role')
+	password = HiddenField('hdn_pwd')
 
 	def validate(self):
 		if not self.act.data:

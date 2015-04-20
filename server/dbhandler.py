@@ -6,17 +6,17 @@ from sqlalchemy import exc
 
 from server import db, dbsession, logger
 
-def get_activity_by_id (id=None):
+def get_act_by_id (id=None):
 	return dbsession.query(db.Act)\
 			.filter(db.Act.id == id)\
 			.first()
 
-def get_activity_by_name (name=None):
+def get_act_by_name (name=None):
 	return dbsession.query(db.Act)\
 			.filter(db.Act.name == name)\
 			.first()
 
-def add_activity(*args, **kwargs):
+def add_act(*args, **kwargs):
 	act = db.Act()
 	act.name = kwargs.get('name')
 	try:
@@ -27,7 +27,7 @@ def add_activity(*args, **kwargs):
 		dbsession.rollback()
 		return False
 
-def mod_activity(*args, **kwargs):
+def mod_act(*args, **kwargs):
 	name = kwargs.get('act_name')
 	if name is None:
 		return False
@@ -35,7 +35,7 @@ def mod_activity(*args, **kwargs):
 	if (kwargs.get('act_id')):
 		act = get_activity_by_id(kwargs.get('act_id'))
 	else:
-		act = get_activity_by_name(name)
+		act = get_act_by_name(name)
 	if act is None:
 		return False
 
@@ -51,11 +51,11 @@ def mod_activity(*args, **kwargs):
 		dbsession.rollback()
 		return False
 
-def del_activity(*args, **kwargs):
+def del_act(*args, **kwargs):
 	if (kwargs.get('act_id')):
-		act = get_activity_by_id(kwargs.get('act_id'))
+		act = get_act_by_id(kwargs.get('act_id'))
 	elif (kwargs.get('act_name')):
-		act = get_activity_by_name(kwargs.get('act_name'))
+		act = get_act_by_name(kwargs.get('act_name'))
 	if role is None:
 		return False
 
@@ -82,7 +82,7 @@ def add_role(*args, **kwargs):
 	act_name = kwargs.get('act_name')
 	act_id = kwargs.get('act_id')
 	if act_name:
-		act = get_activity_by_name(act_name)
+		act = get_act_by_name(act_name)
 		if act:
 			act_id = act.id
 		else:
@@ -92,7 +92,7 @@ def add_role(*args, **kwargs):
 			else:
 				return -1
 	elif act_id:
-		if not get_activity_by_id(act_id):
+		if not get_act_by_id(act_id):
 			return -2
 	else:
 		return -3

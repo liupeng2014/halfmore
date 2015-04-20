@@ -88,7 +88,7 @@ div.post{
 <script type="text/javascript">
 var w_width, w_height, c_left, c_height;
 
-function setFrame() {
+function setFrame () {
 	w_width = window.innerWidth ? window.innerWidth : $(window).width();
 	c_left = 0;
 	if (w_width > 1000) {
@@ -124,7 +124,7 @@ function setFrame() {
 
 var role_list = ["role1@hm", "role2@hm", "role3@hm"];
 
-function clickRole(role) {
+function clickRole (role) {
 	var hit;
 
 	for (var i=0; i < role_list.length; i++) {
@@ -141,7 +141,7 @@ function clickRole(role) {
 	setRole();
 }
 
-function setRole() {
+function setRole () {
 	var role_top = 430;
 	var role_cnt = role_list.length;
 	$("#rolelist").html("");
@@ -151,7 +151,7 @@ function setRole() {
 	}
 }
 
-function setLeft() {
+function setLeft () {
 	$("#left").append("<div id='profile' class='profile' style='left:"+c_left+"'>profile</div>");
 
 	$("#left").append("<div id='rolelist' class='rolelist' style='left:"+c_left+"'>profile</div>");
@@ -159,23 +159,49 @@ function setLeft() {
 	setRole();
 }
 
-function setPost() {
+function setPost () {
 	$("#main").append("<div id='post01' class='post'>post01</div>");
 	$("#main").append("<div id='post02' class='post'>post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02</div>");
 	$("#main").append("<div id='post03' class='post'>理由は半角英数の連なりは1単語として判断されるから。理由は半角英数の連なりは1単語として判断されるから。</div>");
+	$("#main").append("<div id='post04' class='post'>role_info={{ session["role_info"] }}</div>")
 }
 
-function clickAddNew() {
+function setHidden (id, value, form_name) {
+	var h = document.getElementById(id);
+	if (h) {
+		h.value = value;
+	} else {
+		h = document.createElement('input');
+		h.type = 'hidden';
+		h.id = id;
+		h.value = value;
+		document.forms[form_name].appendChild(h);
+	}
+}
+
+function clickEnter () {
+	var form_name = "frm_enter";
+	var form = document.forms[form_name];
+
+	setHidden("hdn_act", document.getElementById("txt_act").value, form_name);
+	setHidden("hdn_rol", document.getElementById("txt_rol").value, form_name);
+	setHidden("hdn_pwd", document.getElementById("txt_pwd").value, form_name);
+
+	form.method = "post";
+	form.submit();
+}
+
+function clickAddNew () {
 	document.getElementById("grey").style.display = "block";
 	document.getElementById("create").style.display = "block";
 }
 
-function clickCreate() {
+function clickCreate () {
 	document.getElementById("grey").style.display = "none";
 	document.getElementById("create").style.display = "none";
 }
 
-function loadNavi() {
+function loadNavi () {
 	document.getElementById("navi").innerHTML = "\
 		<table>\
 			<tr>\
@@ -183,17 +209,15 @@ function loadNavi() {
 				<td width='20px'></td>\
 				<td><input type='button' value='Add New' onclick='clickAddNew()'></td>\
 				<td width='20px'></td>\
-				<form action='/login' method='post' name='login'>\
-				<td><input type='text' name='act' size='10' maxlength='20'></td>\
+				<td><input type='text' id='txt_act' size='10' maxlength='20'></td>\
 				<td>@</td>\
-				<td><input type='text' name='role' size='10' maxlength='20'></td>\
+				<td><input type='text' id='txt_rol' size='10' maxlength='20'></td>\
 				<td width='10px'></td>\
-				<td><input type='password' name='password' size='10' maxlength='20'></td>\
+				<td><input type='password' id='txt_pwd' size='10' maxlength='20'></td>\
 				<td width='10px'></td>\
-				</form>\
-				<td><input type='button' value='Enter' onclick='document.login.submit()'></td>\
+				<td><input type='button' value='Enter' onclick='clickEnter()'></td>\
 				<td width='10px'></td>\
-				<td><input type='button' value='Exit'></td>\
+				<td><input type='button' value='Exit' onclick='clickExit()'></td>\
 			</tr>\
 		</table>\
 	";
@@ -214,6 +238,9 @@ $(window).resize(function() {
 </script>
 </header>
 <body>
+<form name="frm_enter" action="/login"></form>
+<form name="frm_exist" action=""></form>
+<form name="frm_create" action=""></form>
 <div id="bg">
   <div id="navi"></div>
   <div id="left"></div>

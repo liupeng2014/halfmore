@@ -18,6 +18,7 @@ def dump_datetime(value):
 		return None
 	return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
+# For Act
 class Act(Base):
 	__tablename__ = 'act'
 	id = Column(Integer, primary_key=True)
@@ -26,15 +27,19 @@ class Act(Base):
 	modify_time = Column(DateTime, default=func.now())
 
 	role = relationship('Role', cascade='all,delete-orphan', backref='role')
+	af = relationship('ActFollow', cascade='all,delete-orphan')
+	ab = relationship('ActBlock', cascade='all,delete-orphan')
 
 	@property
 	def serialize(self):
 		return {
 			'id': str(self.id),
 			'name': self.name,
-			'create_time': dump_datetime(self.create_time)
+			'create_time': dump_datetime(self.create_time),
+			'modify_time': dump_datetime(self.modify_time)
 		}
 
+# For Role
 class Role(Base):
 	__tablename__ = 'role'
 	__table_args__ = (UniqueConstraint('act_id','name'),)
@@ -58,9 +63,10 @@ class Role(Base):
 	create_time = Column(DateTime, default=func.now())
 	modify_time = Column(DateTime, default=func.now())
 
-	rf = relationship('RoleFollow', cascade='all,delete-orphan')
-	rb = relationship('RoleBlock', cascade='all,delete-orphan')
-	input = relationship('Input', cascade='all,delete-orphan')
+	rf = relationship('RoleFollow', cascade='all,delete-orphan', foreign_keys = 'RoleFollow.follower')
+	rfd = relationship('RoleFollow', cascade='all,delete-orphan', foreign_keys = 'RoleFollow.followed')
+	rb = relationship('RoleBlock', cascade='all,delete-orphan', foreign_keys = 'RoleBlock.blocker')
+	rbd = relationship('RoleBlock', cascade='all,delete-orphan', foreign_keys = 'RoleBlock.blocked')
 
 	@property
 	def serialize(self):
@@ -96,57 +102,54 @@ class ActBlock(Base):
 
 class RoleFollow(Base):
 	__tablename__ = 'role_follow'
-	__table_args__ = (UniqueConstraint('follower', 'role'),)
+	__table_args__ = (UniqueConstraint('follower', 'followed'),)
 	id = Column(Integer, primary_key=True)
 	follower = Column(Integer, ForeignKey('role.id'))
-	role = Column(Integer, ForeignKey('role.id'))
+	followed = Column(Integer, ForeignKey('role.id'))
 
 class RoleBlock(Base):
 	__tablename__ = 'role_block'
-	__table_args__ = (UniqueConstraint('blocker', 'role'),)
+	__table_args__ = (UniqueConstraint('blocker', 'blocked'),)
 	id = Column(Integer, primary_key=True)
 	blocker = Column(Integer, ForeignKey('role.id'))
-	role = Column(Integer, ForeignKey('role.id'))
+	blocked = Column(Integer, ForeignKey('role.id'))
 
-class Input(Base):
-	__tablename__ = 'input'
+# For Input
+class ShortMessage(Base):
+	__tablename__ = 'short_message'
 	id = Column(Integer, primary_key=True)
-	# 0:short_message, 1:long_message, 2: comment, 3:event
-	type = Column(Integer, nullable=False)
-	mark = Column(Integer, default=0) # good mark
+	text = Column(String(200), nullable=False)
 	owner = Column(Integer, ForeignKey('role.id'), nullable=False)
 	create_time = Column(DateTime, default=func.now(), nullable=False)
 	update_time = Column(DateTime, nullable=True)
 
-	short_message = relationship('ShortMessage', cascade='all,delete-orphan')
-	long_message = relationship('LongMessage', cascade='all,delete-orphan')
 	comment = relationship('Comment', cascade='all,delete-orphan')
-
-class ShortMessage(Base):
-	__tablename__ = 'short_message'
-	id = Column(Integer, primary_key=True)
-	input = Column(Integer, ForeignKey('input.id'))
-	text = Column(String(200), nullable=False)
 
 class LongMessage(Base):
 	__tablename__ = 'long_message'
 	id = Column(Integer, primary_key=True)
-	input = Column(Integer, ForeignKey('input.id'))
 	title = Column(String(100), nullable=False)
 	text = Column(String(2000), nullable=False)
+	owner = Column(Integer, ForeignKey('role.id'), nullable=False)
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
+
+	comment = relationship('Comment', cascade='all,delete-orphan')
 
 class Comment(Base):
 	__tablename__ = 'comment'
 	id = Column(Integer, primary_key=True)
-	input = Column(Integer, ForeignKey('input.id'), nullable=False)
-	top = Column(Integer, ForeignKey('input.id'), nullable=False)
-	parent = Column(Integer, ForeignKey('input.id'), nullable=False)
+	short_id = Column(Integer, ForeignKey('short_message.id'), nullable=True)
+	long_id = Column(Integer, ForeignKey('long_message.id'), nullable=True)
+	parent = Column(Integer, nullable=True)
 	text = Column(String(400), nullable=False)
+	owner = Column(Integer, ForeignKey('role.id'), nullable=False)
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
 
 class Event(Base):
 	__tablename__ = 'event'
 	id = Column(Integer, primary_key=True)
-	input = Column(Integer, ForeignKey('input.id'), nullable=False)
 	title = Column(String(20), nullable=False, unique=True)
 	text = Column(String(200), nullable=False)
 	open = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 3:shut, 4:other
@@ -158,14 +161,19 @@ class Event(Base):
 	interval = Column(Integer, default=0) # for repeat=5 add minutes
 	create_time = Column(DateTime, default=func.now(), nullable=False)
 	update_time = Column(DateTime, nullable=True)
+	owner = Column(Integer, ForeignKey('role.id'), nullable=False)
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
 
 class Channel(Base):
 	__tablename__ = 'channel'
 	id = Column(Integer, primary_key=True)
-	input = Column(Integer, ForeignKey('input.id'), nullable=False)
 	title = Column(String(20), nullable=False, unique=True)
 	text = Column(String(200), nullable=False)
 	open = Column(Integer, nullable=False, default=0) # 0:all, 1:account, 2:self, 3:shut, 4:other
 	range = Column(String(500), nullable=True) # for open=4 add account or role
+	create_time = Column(DateTime, default=func.now(), nullable=False)
+	update_time = Column(DateTime, nullable=True)
+	owner = Column(Integer, ForeignKey('role.id'), nullable=False)
 	create_time = Column(DateTime, default=func.now(), nullable=False)
 	update_time = Column(DateTime, nullable=True)

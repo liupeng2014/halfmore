@@ -48,17 +48,17 @@ r4p1: friend2
 '''
 def db_insert_default(session):
 	ACT1_NAME = "act1"
-	ACT1_NAME = "act2"
+	ACT2_NAME = "act2"
 	R1_NAME = "role1"
 	R2_NAME = "role2"
 
-	if not dbh.get_activity_by_name(ACT1_NAME):
-		if not dbh.add_activity(name=ACT1_NAME):
+	if not dbh.get_act_by_name(ACT1_NAME):
+		if not dbh.add_act(name=ACT1_NAME):
 			logger.info("DB_INIT: activity=%s add failed.", ACT1_NAME)
 			return False
 
-	if not dbh.get_activity_by_name(ACT2_NAME):
-		if not dbh.add_activity(name=ACT2_NAME):
+	if not dbh.get_act_by_name(ACT2_NAME):
+		if not dbh.add_act(name=ACT2_NAME):
 			logger.info("DB_INIT: activity=%s add failed.", ACT2_NAME)
 			return False
 
@@ -247,6 +247,6 @@ def db_insert_default(session):
 
 dbsession = db.db_init(cfg.get('database', 'url')+'?check_same_thread=False')
 import dbhandler as dbh
-#db_insert_default(dbsession)
+db_insert_default(dbsession)
 
 import views
