@@ -43,11 +43,14 @@ def login():
 	form = forms.LoginForm()
 
 	if request.method == 'POST':
-		role = dbh.check_role(act_name=form.act.data,
-							role_name=form.role.data,
-							key=form.password.data)
+		role = dbh.check_role(act_name=form.hdn_act.data,
+							role_name=form.hdn_rol.data,
+							key=form.hdn_pwd.data)
+		print "2act_name=%s" % form.hdn_act.data
+		print "2role_name=%s" % form.hdn_rol.data
+		print "2key=%s" % form.hdn_pwd.data
 		if role:
-			session['role_info'] = json.dumps(rp.serialize)
+			session['role_info'] = json.dumps(role.serialize)
 			return render_template('index.html', form=form)
 		else:
 			session['role_info'] = "none"

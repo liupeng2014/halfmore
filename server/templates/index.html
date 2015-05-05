@@ -174,6 +174,7 @@ function setHidden (id, value, form_name) {
 		h = document.createElement('input');
 		h.type = 'hidden';
 		h.id = id;
+		h.name = id;
 		h.value = value;
 		document.forms[form_name].appendChild(h);
 	}
@@ -209,9 +210,9 @@ function loadNavi () {
 				<td width='20px'></td>\
 				<td><input type='button' value='Add New' onclick='clickAddNew()'></td>\
 				<td width='20px'></td>\
-				<td><input type='text' id='txt_act' size='10' maxlength='20'></td>\
-				<td>@</td>\
 				<td><input type='text' id='txt_rol' size='10' maxlength='20'></td>\
+				<td>@</td>\
+				<td><input type='text' id='txt_act' size='10' maxlength='20'></td>\
 				<td width='10px'></td>\
 				<td><input type='password' id='txt_pwd' size='10' maxlength='20'></td>\
 				<td width='10px'></td>\

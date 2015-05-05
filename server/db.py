@@ -72,18 +72,18 @@ class Role(Base):
 	def serialize(self):
 	    return {
 	    	'id': str(self.id),
-	    	'act_id': str(self.actid),
+	    	'act_id': str(self.act_id),
 	    	'name': self.name,
 	    	'key': self.key,
+			'email': self.email,
 	    	'open': str(self.open),
 	    	'status': str(self.status),
-			'email': self.email,
 	    	'gender': str(self.gender),
 			'location': self.location,
 	    	'last_login': dump_datetime(self.last_login),
 	    	'last_logout': dump_datetime(self.last_logout),
 	    	'create_time': dump_datetime(self.create_time),
-	    	'update_time': dump_datetime(self.update_time)
+	    	'modify_time': dump_datetime(self.modify_time)
 	    }
 
 class ActFollow(Base):

@@ -157,7 +157,7 @@ def check_role(*args, **kwargs):
 		return dbsession.query(db.Role)\
 			.filter(db.Act.name == kwargs.get('act_name'))\
 			.filter(db.Role.name == kwargs.get('role_name'))\
-			.filter(db.Role.key == kwargs.get('key'))\
+			.filter(db.Role.key == hashlib.sha256(kwargs.get('key')).hexdigest())\
 			.first()
 
 """

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import re, binascii, socket
+import hashlib
 
 from flask import flash
 from flask.ext.wtf import Form
@@ -16,9 +17,9 @@ import rolepass as rp
 import dbhandler as dbh
 
 class LoginForm(Form):
-	act = HiddenField('hdn_act')
-	role = HiddenField('hdn_role')
-	password = HiddenField('hdn_pwd')
+	hdn_act = HiddenField('hdn_act')
+	hdn_rol = HiddenField('hdn_rol')
+	hdn_pwd = HiddenField('hdn_pwd')
 
 	def validate(self):
 		if not self.act.data:
