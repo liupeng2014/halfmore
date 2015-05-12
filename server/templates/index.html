@@ -37,16 +37,23 @@
 	background-color: #FFFFFF;
 	display: none;
 }
-#left{
+#profile{
 	position: fixed;
 	top: 30px;
 	width: 200px;
-	height: 400px;
+	height: 500px;
 	background-color: #00FFFF;
+}
+#rolelist{
+	position: fixed;
+	top: 530px;
+	width: 200px;
+	height: 0px;
+	background-color: #770000;
 }
 #cm{
 	position: fixed;
-	top: 430px;
+	top: 530px;
 	width: 200px;
 	height: 200px;
 	background-color: #FF00FF;
@@ -62,18 +69,6 @@
 	width: 200px;
 	background-color: #FFFF00;
 }
-#profile{
-	top: 30px;
-	width: 200px;
-	height: 310px;
-	background-color: #770000;
-}
-#rolelist{
-	top: 340px;
-	width: 200px;
-	height: 90px;
-	background-color: #770000;
-}
 div.role{
 	width: 200px;
 	height: 30px;
@@ -87,8 +82,16 @@ div.post{
 </style>
 <script type="text/javascript">
 var w_width, w_height, c_left, c_height;
+var rolelist;
+
+function getLoginRole() {
+	rolelist = '{{ session["role_list"] }}';
+	alert("rolelist=" + rolelist);
+}
 
 function setFrame () {
+	getLoginRole();
+
 	w_width = window.innerWidth ? window.innerWidth : $(window).width();
 	c_left = 0;
 	if (w_width > 1000) {
@@ -104,22 +107,13 @@ function setFrame () {
 	$("#bg").css("height", c_height+30);
 	$("#navi").css("left", c_left);
 	$("#create").css("left", c_left);
-	$("#left").css("left", c_left);
+	$("#profile").css("left", c_left);
+	$("#rolelist").css("left", c_left);
 	$("#cm").css("left", c_left);
 	$("#main").css("left", c_left+200);
 	$("#main").css("height", c_height);
-	$("#main").text("c_left=" + c_left+200);
 	$("#right").css("left", c_left+800);
 	$("#right").css("height", c_height);
-	$("#right").text("c_height=" + c_height + ";w_height=" + w_height);
-
-	var newaccount = document.createElement("input");
-	newaccount.type = "button";
-	newaccount.value = "new account";
-	newaccount.onclick = function() {
-		alert("new account");
-	}
-	document.getElementById("right").appendChild(newaccount);
 }
 
 var role_list = ["role1@hm", "role2@hm", "role3@hm"];
@@ -144,6 +138,7 @@ function clickRole (role) {
 function setRole () {
 	var role_top = 430;
 	var role_cnt = role_list.length;
+	var role_height = role_cnt > 3 ? 90 : role_cnt * 30;
 	$("#rolelist").html("");
 	for (var i = 0; i < role_cnt; i++) {
 		$("#rolelist").append("<div id='"+role_list[i]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+role_list[i]+"</div>");
@@ -163,7 +158,9 @@ function setPost () {
 	$("#main").append("<div id='post01' class='post'>post01</div>");
 	$("#main").append("<div id='post02' class='post'>post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02</div>");
 	$("#main").append("<div id='post03' class='post'>理由は半角英数の連なりは1単語として判断されるから。理由は半角英数の連なりは1単語として判断されるから。</div>");
-	$("#main").append("<div id='post04' class='post'>role_info={{ session["role_info"] }}</div>")
+	$("#main").append("<div id='post04' class='post'>role_info={{ session["role_info"] }}</div>");
+
+	$("#profile").text("role_info={{ session["role_info"] }}");
 }
 
 function setHidden (id, value, form_name) {
@@ -226,7 +223,7 @@ function loadNavi () {
 
 $(function(){
 	setFrame();
-	setLeft();
+
 	setPost();
 
 	loadNavi();
@@ -244,7 +241,8 @@ $(window).resize(function() {
 <form name="frm_create" action=""></form>
 <div id="bg">
   <div id="navi"></div>
-  <div id="left"></div>
+  <div id="profile"></div>
+  <div id="rolelist"></div>
   <div id="cm">cm</div>
   <div id="main">main</div>
   <div id="right">right</div>
