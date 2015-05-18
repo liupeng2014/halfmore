@@ -43,16 +43,16 @@
 	position: fixed;
 	top: 30px;
 	width: 200px;
-	height: 500px;
+	height: 450px;
 	background-color: #00FFFF;
 	z-index: 2;
 }
 #rolelist{
 	position: fixed;
-	top: 530px;
+	top: 480px;
 	width: 200px;
-	height: 0px;
-	background-color: #770000;
+	height: 50px;
+	background-color: #007777;
 	z-index: 2;
 }
 #cm{
@@ -93,14 +93,10 @@ div.post{
 var w_width, w_height, c_left, c_height;
 
 function getLoginRole() {
-	return '{{ session["role_list"] }}';
-//	alert("rolelist=" + rolelist);
+	rolelist = '{{ session["role_list"] }}';
 }
 
 function setFrame () {
-//	var role_count = getLoginRole().length();
-//	var role_height = role_count > 3 ? 60 : role_count * 20;
-
 	w_width = window.innerWidth ? window.innerWidth : $(window).width();
 	c_left = 0;
 	if (w_width > 1000) {
