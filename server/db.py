@@ -45,7 +45,7 @@ class Role(Base):
 	__table_args__ = (UniqueConstraint('act_id','name'),)
 	id = Column(Integer, primary_key=True)
 	act_id = Column(Integer, ForeignKey('act.id'))
-	name = Column(String(20), nullable=False, unique=True)
+	name = Column(String(20), nullable=False)
 	key = Column(String(64), nullable=False)
 	email = Column(String(200), nullable=False)
 	open = Column(Integer, nullable=False, default=0)

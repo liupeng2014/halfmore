@@ -25,7 +25,7 @@ def LOG(*args):
 			message += " " + str(item[1])
 		else:
 			message += " " + item[1]
-	logger.info('%s %s:%s', request.remote_addr, session.get('username'), message)
+	logger.debug('%s:%s', request.remote_addr, message)
 
 @app.route('/')
 def root():
@@ -34,26 +34,40 @@ def root():
 @app.route('/index')
 def index():
 	form = forms.LoginForm()
-
-	session['role_info'] = "init"
 	return render_template('index.html', form=form)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
 	form = forms.LoginForm()
+	rolelist = session.get('role_list')
 
 	if request.method == 'POST':
-		role = dbh.check_role(act_name=form.hdn_act.data,
-							role_name=form.hdn_rol.data,
-							key=form.hdn_pwd.data)
-		print "2act_name=%s" % form.hdn_act.data
-		print "2role_name=%s" % form.hdn_rol.data
-		print "2key=%s" % form.hdn_pwd.data
+		actname = form.hdn_act.data
+		rolename = form.hdn_rol.data
+		key = form.hdn_pwd.data
+		role = dbh.check_role(act_name=actname, role_name=rolename, key=key)
 		if role:
-			session['role_info'] = json.dumps(role.serialize)
+			if rolelist:
+				for r in rolelist:
+					r = json.loads(r)
+					LOG("whole_id= " + r["whole_id"])
+					LOG(rolename + "@" + actname)
+					LOG(str(role.id) + "@" + str(role.act_id))
+					if r["whole_id"] == (str(role.id) + "@" + str(role.act_id)):
+						LOG(rolename + "@" + actname + " has already entered.")
+						return render_template('index.html', form=form)
+			else:
+				rolelist = []
+
+			role_dict = role.serialize;
+			role_dict["whole_id"] = str(role.id) + "@" + str(role.act_id)
+			role_dict["whole_name"] = rolename + "@" + actname
+			rolelist.append(json.dumps(role_dict))
+			session["role_list"] = rolelist
+			LOG(rolename + "@" + actname + " entered.")
 			return render_template('index.html', form=form)
 		else:
-			session['role_info'] = "none"
+			LOG(rolename + "@" + actname + ":" + key + " NOT exist.")
 			return render_template('index.html', form=form)
 
 	return redirect(url_for('index'))

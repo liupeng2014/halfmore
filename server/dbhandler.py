@@ -76,6 +76,7 @@ def get_role_by_name(act_name=None, role_name=None):
 	return dbsession.query(db.Role)\
 			.filter(db.Role.name == role_name)\
 			.filter(db.Act.name == act_name)\
+			.filter(db.Act.id == db.Role.act_id)\
 			.first()
 
 def add_role(*args, **kwargs):
@@ -158,6 +159,7 @@ def check_role(*args, **kwargs):
 			.filter(db.Act.name == kwargs.get('act_name'))\
 			.filter(db.Role.name == kwargs.get('role_name'))\
 			.filter(db.Role.key == hashlib.sha256(kwargs.get('key')).hexdigest())\
+			.filter(db.Act.id == db.Role.act_id)\
 			.first()
 
 """
