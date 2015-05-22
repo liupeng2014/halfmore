@@ -34,12 +34,16 @@ def root():
 @app.route('/index')
 def index():
 	form = forms.LoginForm()
+	session["role_list"] = json.dumps([], sort_keys=True, ensure_ascii=False, indent=2)
 	return render_template('index.html', form=form)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
 	form = forms.LoginForm()
-	rolelist = session.get('role_list')
+	rolelist = session.get('role_list', None)
+	if rolelist is not None:
+		LOG("rolelist2= " + rolelist)
+		rolelist = json.loads(rolelist, "utf-8")
 
 	if request.method == 'POST':
 		actname = form.hdn_act.data
@@ -49,7 +53,7 @@ def login():
 		if role:
 			if rolelist:
 				for r in rolelist:
-					r = json.loads(r)
+					#r = json.loads(r, "utf-8")
 					LOG("whole_id= " + r["whole_id"])
 					LOG(rolename + "@" + actname)
 					LOG(str(role.id) + "@" + str(role.act_id))
@@ -62,8 +66,16 @@ def login():
 			role_dict = role.serialize;
 			role_dict["whole_id"] = str(role.id) + "@" + str(role.act_id)
 			role_dict["whole_name"] = rolename + "@" + actname
-			rolelist.append(json.dumps(role_dict))
-			session["role_list"] = rolelist
+			rolelist.append(role_dict)
+			'''
+			rolelist.append(json.dumps(role_dict, sort_keys=True, ensure_ascii=False, indent=2)\
+				.replace(u'<', u'\\u003c')\
+			    .replace(u'>', u'\\u003e')\
+			    .replace(u'&', u'\\u0026')\
+			    .replace(u"'", u'\\u0027'))
+			'''
+			session["role_list"] = json.dumps(rolelist, sort_keys=True, ensure_ascii=False, indent=2)
+			LOG("rolelist1= " + session["role_list"])
 			LOG(rolename + "@" + actname + " entered.")
 			return render_template('index.html', form=form)
 		else:
@@ -74,13 +86,9 @@ def login():
 
 @app.route('/logout', methods = ['GET', 'POST'])
 def logout():
-	session.pop('rp', None)
-	session.pop('role', None)
-	if session.get('operation') is not None:
-		session.pop('operation', None)
+	session.pop('role_list', None)
 
-	form = forms.LoginForm()
-	return render_template('login.html', form=form)
+	return redirect(url_for('index'))
 
 @app.route('/homepage')
 def homepage():

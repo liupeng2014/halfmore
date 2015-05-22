@@ -74,7 +74,6 @@ class Role(Base):
 	    	'id': str(self.id),
 	    	'act_id': str(self.act_id),
 	    	'name': self.name,
-	    	'key': self.key,
 			'email': self.email,
 	    	'open': str(self.open),
 	    	'status': str(self.status),

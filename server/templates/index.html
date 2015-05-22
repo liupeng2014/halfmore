@@ -43,7 +43,7 @@
 	position: fixed;
 	top: 30px;
 	width: 200px;
-	height: 450px;
+	height: 350px;
 	background-color: #00FFFF;
 	z-index: 2;
 }
@@ -92,10 +92,6 @@ div.post{
 <script type="text/javascript">
 var w_width, w_height, c_left, c_height;
 
-function getLoginRole() {
-	rolelist = '{{ session["role_list"] }}';
-}
-
 function setFrame () {
 	w_width = window.innerWidth ? window.innerWidth : $(window).width();
 	c_left = 0;
@@ -104,10 +100,10 @@ function setFrame () {
 	}
 
 	w_height = window.innerHeight ? window.innerHeight : $(window).height();
-	c_height = w_height - 30;
-	if (w_height < 600) {
-		c_height = 600;
+	if (w_height < 500) {
+		c_height = 500;
 	}
+	c_height = w_height - 30;
 
 	$("#bg").css("height", c_height+30);
 	$("#navi").css("left", c_left);
@@ -122,7 +118,7 @@ function setFrame () {
 }
 
 function clickRole (role) {
-	var role_list = getLoginRole();
+	var rolelist = {{ session['role_list']|safe }};
 	var hit;
 
 /*
@@ -152,6 +148,27 @@ function setRole () {
 	}
 }
 
+function setRoleList () {
+	var rolelist = {{ session['role_list']|safe }};
+	var role_cnt = rolelist.length;
+	var role_height = role_cnt > 3 ? 150 : role_cnt * 50;
+	var role_top = 380;
+
+	$("#rolelist").css("height", role_height);
+
+	if (rolelist[0] != null && rolelist[0]["whole_id"] != null) {
+		$("#rolelist").html("");
+		for (var i = 0; i < role_cnt; i++) {
+			var r = rolelist[i];
+			$("#rolelist").append("<div id='"+r["whole_id"]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+r["whole_name"]+"</div>");
+			role_top += 30;
+		}
+	} else {
+		$("#rolelist").text("not login");
+	}
+}
+
+/*
 function setLeft () {
 	$("#left").append("<div id='profile' class='profile' style='left:"+c_left+"'>profile</div>");
 
@@ -159,14 +176,36 @@ function setLeft () {
 
 	setRole();
 }
+*/
+
+function setProfile () {
+/*
+	var role_list = $.parseJSON("{{ session['role_list']|safe }}");
+*/
+	var rolelist = {{ session['role_list']|safe }};
+	var role = rolelist[0];
+	var roleinfo ="";
+
+	if (role) {
+		var key = "";
+		for (key in role) {
+			roleinfo += key + ": " + role[key] + "<br>";
+		}
+	} else {
+		roleinfo = "roleinfo is null";
+	}
+	$("#profile").html(roleinfo);
+}
 
 function setPost () {
 	$("#main").append("<div id='post01' class='post'>post01</div>");
 	$("#main").append("<div id='post02' class='post'>post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02</div>");
 	$("#main").append("<div id='post03' class='post'>理由は半角英数の連なりは1単語として判断されるから。理由は半角英数の連なりは1単語として判断されるから。</div>");
-	$("#main").append("<div id='post04' class='post'>role_info={{ session["role_list"] }}</div>");
+/*
+	$("#main").append("<div id='post04' class='post'>role_info={{ session['role_list']|safe }}</div>");
 
-//	$("#profile").text("role_list={{ session["role_list"] }}");
+	$("#profile").text("role_list={{ session['role_list']|safe }}");
+*/
 }
 
 function setHidden (id, value, form_name) {
@@ -206,6 +245,28 @@ function clickEnter () {
 	setHidden("hdn_rol", txt_rol.value, form_name);
 	setHidden("hdn_act", txt_act.value, form_name);
 	setHidden("hdn_pwd", txt_pwd.value, form_name);
+
+	form.method = "post";
+	form.submit();
+}
+
+function clickExit () {
+	var form_name = "frm_exit";
+	var form = document.forms[form_name];
+	var txt_rol = document.getElementById("txt_rol");
+	var txt_act = document.getElementById("txt_act");
+
+	if (txt_rol.value.length == 0 ) {
+		alert("rol.length=" + txt_rol.value.length);
+		return false;
+	}
+	if (txt_act.value.length == 0 ) {
+		alert("act.length=" + txt_act.value.length);
+		return false;
+	}
+
+	setHidden("hdn_rol", txt_rol.value, form_name);
+	setHidden("hdn_act", txt_act.value, form_name);
 
 	form.method = "post";
 	form.submit();
@@ -254,9 +315,13 @@ function loadNavi () {
 $(function(){
 	setFrame();
 
-	setPost();
-
 	loadNavi();
+
+	setProfile();
+
+	setRoleList();
+
+	setPost();
 });
 
 $(window).resize(function() {
@@ -268,7 +333,7 @@ $(window).resize(function() {
 </header>
 <body>
 <form name="frm_enter" action="/login"></form>
-<form name="frm_exist" action=""></form>
+<form name="frm_exit" action="/logout"></form>
 <form name="frm_create" action=""></form>
 <div id="bg">
   <div id="navi"></div>
