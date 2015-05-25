@@ -49,18 +49,10 @@
 }
 #rolelist{
 	position: fixed;
-	top: 480px;
+	top: 380px;
 	width: 200px;
 	height: 50px;
 	background-color: #007777;
-	z-index: 2;
-}
-#cm{
-	position: fixed;
-	top: 530px;
-	width: 200px;
-	height: 200px;
-	background-color: #FF00FF;
 	z-index: 2;
 }
 #main{
@@ -149,22 +141,22 @@ function setRole () {
 }
 
 function setRoleList () {
-	var rolelist = {{ session['role_list']|safe }};
-	var role_cnt = rolelist.length;
-	var role_height = role_cnt > 3 ? 150 : role_cnt * 50;
+	var role_list = {{ session['role_list']|safe }};
+	var role_cnt = role_list.length;
+	var role_height = role_cnt > 3 ? 150 : role_cnt < 1 ? 50 : role_cnt * 50;
 	var role_top = 380;
 
 	$("#rolelist").css("height", role_height);
 
-	if (rolelist[0] != null && rolelist[0]["whole_id"] != null) {
+	if (role_list[0] != null && role_list[0]["whole_id"] != null) {
 		$("#rolelist").html("");
 		for (var i = 0; i < role_cnt; i++) {
-			var r = rolelist[i];
+			var r = role_list[i];
 			$("#rolelist").append("<div id='"+r["whole_id"]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+r["whole_name"]+"</div>");
-			role_top += 30;
+			role_top += 50;
 		}
 	} else {
-		$("#rolelist").text("not login");
+		$("#rolelist").html("not login");
 	}
 }
 
