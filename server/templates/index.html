@@ -109,39 +109,41 @@ function setFrame () {
 	$("#right").css("height", c_height);
 }
 
-function clickRole (role) {
-	var rolelist = {{ session['role_list']|safe }};
+function clickRole (role_div) {
 	var hit;
 
-/*
-	for (var i=0; i < role_list.length; i++) {
-		if (role.id == role_list[i]) {
+	for (var i = 0; i < role_list.length; i++) {
+		var role = role_list[i];
+		if (role_div.id == role["whole_id"]) {
 			if (i != 0) {
 				hit = role_list[i];
-				role_list[i] = role_list[0];
+				for (var j = i; j > 0; j--) {
+					role_list[j] = role_list[j-1];
+				}
 				role_list[0] = hit;
+
+				setProfile();
+				setRoleList();
 			}
 			break;
 		}
 	}
-
-	setRole();
-*/
 }
 
 function setRole () {
-	var role_top = 430;
 	var role_cnt = role_list.length;
-	var role_height = role_cnt > 3 ? 90 : role_cnt * 30;
+	var role_height = role_cnt > 3 ? 150 : role_cnt < 1 ? 50 : role_cnt * 50;
+	var role_top = 380;
+
 	$("#rolelist").html("");
 	for (var i = 0; i < role_cnt; i++) {
-		$("#rolelist").append("<div id='"+role_list[i]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+role_list[i]+"</div>");
-		role_top += 30;
+		var r = role_list[i];
+		$("#rolelist").append("<div id='"+r["whole_id"]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+r["whole_name"]+"</div>");
+		role_top += 50;
 	}
 }
 
 function setRoleList () {
-	var role_list = {{ session['role_list']|safe }};
 	var role_cnt = role_list.length;
 	var role_height = role_cnt > 3 ? 150 : role_cnt < 1 ? 50 : role_cnt * 50;
 	var role_top = 380;
@@ -171,11 +173,7 @@ function setLeft () {
 */
 
 function setProfile () {
-/*
-	var role_list = $.parseJSON("{{ session['role_list']|safe }}");
-*/
-	var rolelist = {{ session['role_list']|safe }};
-	var role = rolelist[0];
+	var role = role_list[0];
 	var roleinfo ="";
 
 	if (role) {
@@ -304,11 +302,14 @@ function loadNavi () {
 	";
 }
 
+var role_list;
+
 $(function(){
 	setFrame();
 
 	loadNavi();
 
+	role_list = {{ session['role_list']|safe }};
 	setProfile();
 
 	setRoleList();
