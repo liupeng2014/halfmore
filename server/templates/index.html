@@ -31,6 +31,26 @@
 	text-align: right;
 	z-index: 10;
 }
+#message{
+	position: fixed;
+	top: 30px;
+	width: 1000px;
+	height: 50px;
+	background-color: pink;
+	text-align: left;
+	z-index: 10;
+	display: none;
+}
+#close{
+	position: fixed;
+	top: 30px;
+	width: 50px;
+	height: 50px;
+	background-color: #550000;
+	text-align: left;
+	z-index: 11;
+	display: none;
+}
 #create{
 	position: fixed;
 	top: 30px;
@@ -66,6 +86,7 @@
 	position: fixed;
 	top: 30px;
 	width: 200px;
+	height: 500px;
 	background-color: #FFFF00;
 	z-index: 2;
 }
@@ -95,7 +116,6 @@ function setFrame () {
 	if (w_height < 500) {
 		c_height = 500;
 	}
-	c_height = w_height - 30;
 
 	$("#bg").css("height", c_height+30);
 	$("#navi").css("left", c_left);
@@ -106,7 +126,8 @@ function setFrame () {
 	$("#main").css("left", c_left+200);
 //	$("#main").css("height", c_height);
 	$("#right").css("left", c_left+800);
-	$("#right").css("height", c_height);
+//	$("#right").css("height", c_height);
+	$("#message").css("left", c_left);
 }
 
 function clickRole (role_div) {
@@ -130,19 +151,6 @@ function clickRole (role_div) {
 	}
 }
 
-function setRole () {
-	var role_cnt = role_list.length;
-	var role_height = role_cnt > 3 ? 150 : role_cnt < 1 ? 50 : role_cnt * 50;
-	var role_top = 380;
-
-	$("#rolelist").html("");
-	for (var i = 0; i < role_cnt; i++) {
-		var r = role_list[i];
-		$("#rolelist").append("<div id='"+r["whole_id"]+"' class='role' style='left:"+c_left+";top:"+role_top+"' onclick='clickRole(this)'>"+r["whole_name"]+"</div>");
-		role_top += 50;
-	}
-}
-
 function setRoleList () {
 	var role_cnt = role_list.length;
 	var role_height = role_cnt > 3 ? 150 : role_cnt < 1 ? 50 : role_cnt * 50;
@@ -161,16 +169,6 @@ function setRoleList () {
 		$("#rolelist").html("not login");
 	}
 }
-
-/*
-function setLeft () {
-	$("#left").append("<div id='profile' class='profile' style='left:"+c_left+"'>profile</div>");
-
-	$("#left").append("<div id='rolelist' class='rolelist' style='left:"+c_left+"'>profile</div>");
-
-	setRole();
-}
-*/
 
 function setProfile () {
 	var role = role_list[0];
@@ -191,11 +189,6 @@ function setPost () {
 	$("#main").append("<div id='post01' class='post'>post01</div>");
 	$("#main").append("<div id='post02' class='post'>post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02 post02</div>");
 	$("#main").append("<div id='post03' class='post'>理由は半角英数の連なりは1単語として判断されるから。理由は半角英数の連なりは1単語として判断されるから。</div>");
-/*
-	$("#main").append("<div id='post04' class='post'>role_info={{ session['role_list']|safe }}</div>");
-
-	$("#profile").text("role_list={{ session['role_list']|safe }}");
-*/
 }
 
 function setHidden (id, value, form_name) {
@@ -302,12 +295,36 @@ function loadNavi () {
 	";
 }
 
+function loadMessage () {
+	var error = '{{ error|safe }}';
+
+	if (error.length == 0) {
+		alert("no errors");
+		setFrame();
+		return;
+	}
+
+	document.getElementById("message").innerHTML = "<ul><li>" + error + "</li></ul>";
+	document.getElementById("message").style.display = "block";
+
+	$("#close").css("left", c_left+950);
+	document.getElementById("close").innerHTML = "<p><font size='6'>X</font></p>";
+	document.getElementById("close").style.display = "block";
+}
+
+function clickClose () {
+	document.getElementById("message").style.display = "none";
+	document.getElementById("close").style.display = "none";
+}
+
 var role_list;
 
 $(function(){
 	setFrame();
 
 	loadNavi();
+
+	loadMessage();
 
 	role_list = {{ session['role_list']|safe }};
 	setProfile();
@@ -335,6 +352,8 @@ $(window).resize(function() {
   <div id="main"></div>
   <div id="right">right</div>
 </div>
+<div id="message"></div>
+<div id="close" onclick="clickClose()"></div>
 <div id="grey"></div>
 <div id="create" onclick="clickCreate()"></div>
 </body>

@@ -67,20 +67,14 @@ def login():
 			role_dict["whole_id"] = str(role.id) + "@" + str(role.act_id)
 			role_dict["whole_name"] = rolename + "@" + actname
 			rolelist.append(role_dict)
-			'''
-			rolelist.append(json.dumps(role_dict, sort_keys=True, ensure_ascii=False, indent=2)\
-				.replace(u'<', u'\\u003c')\
-			    .replace(u'>', u'\\u003e')\
-			    .replace(u'&', u'\\u0026')\
-			    .replace(u"'", u'\\u0027'))
-			'''
 			session["role_list"] = json.dumps(rolelist, sort_keys=True, ensure_ascii=False, indent=2)
 			LOG("rolelist1= " + session["role_list"])
 			LOG(rolename + "@" + actname + " entered.")
 			return render_template('index.html', form=form)
 		else:
+			error = rolename + "@" + actname + " NOT exist."
 			LOG(rolename + "@" + actname + ":" + key + " NOT exist.")
-			return render_template('index.html', form=form)
+			return render_template('index.html', form=form, error=json.dumps(error))
 
 	return redirect(url_for('index'))
 
