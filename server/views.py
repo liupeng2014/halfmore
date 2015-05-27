@@ -80,7 +80,19 @@ def login():
 
 @app.route('/logout', methods = ['GET', 'POST'])
 def logout():
-	session.pop('role_list', None)
+	form = forms.LoginForm()
+	rolelist = session.get('role_list', None)
+	if rolelist is not None:
+		rolelist = json.loads(rolelist, "utf-8")
+
+	if request.method == 'POST':
+		actname = form.hdn_act.data
+		rolename = form.hdn_rol.data
+		for r in rolelist:
+			if r["whole_name"] == (actname + "@" + rolename):
+				# remove r from rolelist
+				LOG(rolename + "@" + actname + " existed.")
+				return render_template('index.html', form=form)
 
 	return redirect(url_for('index'))
 
