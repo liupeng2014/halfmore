@@ -238,6 +238,11 @@ function clickExit () {
 	var form = document.forms[form_name];
 	var txt_rol = document.getElementById("txt_rol");
 	var txt_act = document.getElementById("txt_act");
+	var cur_rol = role_list[0];
+
+	if (!cur_rol) {
+		return;
+	}
 
 	if (txt_rol.value.length == 0 ) {
 		alert("rol.length=" + txt_rol.value.length);
@@ -250,6 +255,12 @@ function clickExit () {
 
 	setHidden("hdn_rol", txt_rol.value, form_name);
 	setHidden("hdn_act", txt_act.value, form_name);
+	if ((txt_rol.value + "@" + txt_act.value) == cur_rol["whole_name"]) {
+		if (role_list[1]) {
+			cur_rol = role_list[1];
+		}
+	}
+	setHidden("hdn_cur", cur_rol["whole_id"], form_name);	
 
 	form.method = "post";
 	form.submit();

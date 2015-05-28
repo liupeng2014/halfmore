@@ -78,21 +78,43 @@ def login():
 
 	return redirect(url_for('index'))
 
+def list_up_role(top, rolelist):
+	for i in range(len(rolelist)):
+		if (rolelist[i]["whole_id"] == top):
+			if (i == 0):
+				break
+			else:
+				tmp_rol = rolelist[0]
+				rolelist[0] = rolelist[i]
+				rolelist[i] = tmp_rol
+			break
+	return rolelist
+
 @app.route('/logout', methods = ['GET', 'POST'])
 def logout():
 	form = forms.LoginForm()
 	rolelist = session.get('role_list', None)
 	if rolelist is not None:
+		LOG("rolelist4= " + rolelist)
 		rolelist = json.loads(rolelist, "utf-8")
 
 	if request.method == 'POST':
 		actname = form.hdn_act.data
 		rolename = form.hdn_rol.data
+		currole = form.hdn_cur.data
 		for r in rolelist:
-			if r["whole_name"] == (actname + "@" + rolename):
-				# remove r from rolelist
-				LOG(rolename + "@" + actname + " existed.")
+			if r["whole_name"] == (rolename + "@" + actname):
+				rolelist.remove(r)
+				rolelist = list_up_role(currole, rolelist)
+				session["role_list"] = json.dumps(rolelist, sort_keys=True, ensure_ascii=False, indent=2)
+				LOG("rolelist3= " + session["role_list"])
+				LOG(rolename + "@" + actname + " exited.")
 				return render_template('index.html', form=form)
+
+		rolelist = list_up_role(currole, rolelist)
+		error = rolename + "@" + actname + " NOT login."
+		LOG(rolename + "@" + actname + " NOT login.")
+		return render_template('index.html', form=form, error=json.dumps(error))
 
 	return redirect(url_for('index'))
 

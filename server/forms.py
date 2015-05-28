@@ -20,6 +20,7 @@ class LoginForm(Form):
 	hdn_act = HiddenField('hdn_act')
 	hdn_rol = HiddenField('hdn_rol')
 	hdn_pwd = HiddenField('hdn_pwd')
+	hdn_cur = HiddenField('hdn_cur')
 
 	def validate(self):
 		if not self.act.data:
