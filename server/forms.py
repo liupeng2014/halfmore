@@ -37,6 +37,25 @@ class LoginForm(Form):
 
 		return True		
 
+class CreateForm(Form):
+	hdn_act_new = HiddenField('hdn_act_new')
+	hdn_new_type = HiddenField('hdn_new_type')
+
+	def validate(self):
+		if not self.act.data:
+			flash(u'Act is required.')
+			return False
+
+		if not self.role.data:
+			flash(u'Role is required.')
+			return False
+
+		if not self.password.data:
+			flash(u'Password is required.')
+			return False
+
+		return True		
+
 class HomeForm(Form):
 	def __init__(self):
 		self.rp = None

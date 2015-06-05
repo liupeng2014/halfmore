@@ -12,6 +12,7 @@
 	background-color: Grey;
 	opacity: 0.5;
 	display: none;
+	z-index: 8;
 }
 #bg{
 	position: absolute;
@@ -55,9 +56,10 @@
 	position: fixed;
 	top: 30px;
 	width: 1000px;
-	height: 300px;
+	height: 400px;
 	background-color: #FFFFFF;
 	display: none;
+	z-index: 9;
 }
 #profile{
 	position: fixed;
@@ -208,9 +210,9 @@ function setHidden (id, value, form_name) {
 function clickEnter () {
 	var form_name = "frm_enter";
 	var form = document.forms[form_name];
-	var txt_rol = document.getElementById("txt_rol");
-	var txt_act = document.getElementById("txt_act");
-	var txt_pwd = document.getElementById("txt_pwd");
+	var txt_rol = document.getElementById("txt_rol_usr");
+	var txt_act = document.getElementById("txt_act_usr");
+	var txt_pwd = document.getElementById("txt_pwd_usr");
 
 	if (txt_rol.value.length == 0 ) {
 		alert("rol.length=" + txt_rol.value.length);
@@ -236,8 +238,8 @@ function clickEnter () {
 function clickExit () {
 	var form_name = "frm_exit";
 	var form = document.forms[form_name];
-	var txt_rol = document.getElementById("txt_rol");
-	var txt_act = document.getElementById("txt_act");
+	var txt_rol = document.getElementById("txt_rol_usr");
+	var txt_act = document.getElementById("txt_act_usr");
 	var cur_rol = role_list[0];
 
 	if (!cur_rol) {
@@ -292,11 +294,11 @@ function loadNavi () {
 				<td width='20px'></td>\
 				<td><input type='button' value='Add New' onclick='clickAddNew()'></td>\
 				<td width='20px'></td>\
-				<td><input type='text' id='txt_rol' size='10' maxlength='20' onkeydown='onKeyDown(event)'></td>\
+				<td><input type='text' id='txt_rol_usr' size='10' maxlength='20' onkeydown='onKeyDown(event)'></td>\
 				<td>@</td>\
-				<td><input type='text' id='txt_act' size='10' maxlength='20' onkeydown='onKeyDown(event)'></td>\
+				<td><input type='text' id='txt_act_usr' size='10' maxlength='20' onkeydown='onKeyDown(event)'></td>\
 				<td width='10px'></td>\
-				<td><input type='password' id='txt_pwd' size='10' maxlength='20' onkeydown='onKeyDown(event)'></td>\
+				<td><input type='password' id='txt_pwd_usr' size='10' maxlength='20' onkeydown='onKeyDown(event)'></td>\
 				<td width='10px'></td>\
 				<td><input type='button' value='Enter' onclick='clickEnter()'></td>\
 				<td width='10px'></td>\
@@ -304,13 +306,14 @@ function loadNavi () {
 			</tr>\
 		</table>\
 	";
+
+	document.getElementById("txt_rol").focus();
 }
 
 function loadMessage () {
 	var error = '{{ error|safe }}';
 
 	if (error.length == 0) {
-		alert("no errors");
 		setFrame();
 		return;
 	}
@@ -324,8 +327,125 @@ function loadMessage () {
 }
 
 function clickClose () {
-	document.getElementById("message").style.display = "none";
 	document.getElementById("close").style.display = "none";
+
+	if (document.getElementById("message").style.display == "block") {
+		document.getElementById("message").style.display = "none";
+	}
+
+	if (document.getElementById("create").style.display == "block") {
+		document.getElementById("create").style.display = "none";
+	}
+}
+
+function clickCrateAct () {
+	var form_name = "frm_create";
+	var form = document.forms[form_name];
+	var txt_act_new = document.getElementById("txt_act_new");
+
+	if (txt_act_new.value.length == 0 ) {
+		alert("rol.length=0");
+		return false;
+	}
+
+	setHidden("hdn_act_new", txt_act_new.value, form_name);
+	setHidden("hdn_new_type", "act", form_name);
+
+	form.method = "post";
+	form.submit();
+}
+
+function clickCreateNewAct () {
+	var create_act = "\
+		<table align='center'>\
+			<tr>\
+				<td height='50px' colspan='3'>\
+			</tr>\
+			<tr>\
+				<td width='100px'>\
+					<span>Act Name</span>
+				</td>\
+				<td width='20px'></td>\
+				<td width='100px'>\
+					<input type='text' id='txt_act_new' size='10' maxlength='20'>\
+				</td>\
+			</tr>\
+			<tr>\
+				<td width='100px'>\
+					<input type='button' value='cancle' onclick='showCreateIndex()'>\
+				</td>\
+				<td width='20px'></td>\
+				<td width='100px'>\
+					<input type='button' value='create' onclick='clickCrateAct()'>\
+				</td>\
+			</tr>\
+		</table>\
+	";
+
+	document.getElementById("create").innerHTML = create_act;
+}
+
+function clickCreateNewRole () {
+	var create_role = "\
+		<table align='center'>\
+			<tr>\
+				<td height='50px' colspan='3'>\
+			</tr>\
+			<tr>\
+				<td width='100px'>\
+					<span>Role Name</span>
+				</td>\
+				<td width='20px'></td>\
+				<td width='100px'>\
+					<input type='text' id='txt_act_role' size='10' maxlength='20'>\
+					<span>@act_name</span>
+				</td>\
+			</tr>\
+			<tr>\
+				<td width='100px'>\
+					<input type='button' value='cancel' onclick='showCreateIndex()'>\
+				</td>\
+				<td width='20px'></td>\
+				<td width='100px'>\
+					<input type='button' value='create' onclick='clickCrateRole()'>\
+				</td>\
+			</tr>\
+		</table>\
+	";
+
+	document.getElementById("create").innerHTML = create_role;
+}
+
+function showCreateIndex () {
+	var create_index = "\
+		<table align='center'>\
+			<tr>\
+				<td height='50px' colspan='3'>\
+			</tr>\
+			<tr>\
+				<td width='300px' height='300px'>\
+					<div width='300px' height='300px' onclick='clickCreateNewAct()'><p>Create new act</p></div>\
+				</td>\
+				<td width='50px' height='300px'></td>\
+				<td width='300px' height='300px'>\
+					<div width='300px' height='300px' onclick='clickCreateNewRole()'><p>Create new role</p></div>\
+				</td>\
+			</tr>\
+			<tr>\
+				<td height='50px' colspan='3'>\
+			</tr>\
+		</table>\
+	";
+
+	document.getElementById("create").innerHTML = create_index;
+}
+
+function loadCreate () {
+	showCreateIndex();
+
+	$("#close").css("left", c_left+950);
+	document.getElementById("close").innerHTML = "<p><font size='6'>X</font></p>";
+	document.getElementById("close").style.display = "block";
 }
 
 var role_list;
@@ -336,6 +456,8 @@ $(function(){
 	loadNavi();
 
 	loadMessage();
+
+	locadCreate()
 
 	role_list = {{ session['role_list']|safe }};
 	setProfile();
@@ -355,7 +477,7 @@ $(window).resize(function() {
 <body>
 <form name="frm_enter" action="/login"></form>
 <form name="frm_exit" action="/logout"></form>
-<form name="frm_create" action=""></form>
+<form name="frm_create" action="/create"></form>
 <div id="bg">
   <div id="navi"></div>
   <div id="profile"></div>
