@@ -1,9 +1,12 @@
 <html>
 <header>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<script type="text/javascript" src="../static/js/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="../static/js/index.js"></script>
-<script type="text/javascript" src="../static/js/account.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.0.min.js') }}"></script>
+<script type="text/javascript">
+var role_list = {{ session['role_list']|safe }};	
+var error = {{ error|safe }};
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script type="text/javascript">
 $(function(){
 	setFrame();
@@ -12,9 +15,6 @@ $(function(){
 
 	loadMessage();
 
-	locadCreate()
-
-	role_list = {{ session['role_list']|safe }};
 	setProfile();
 
 	setRoleList();

@@ -35,7 +35,7 @@ def root():
 def index():
 	form = forms.LoginForm()
 	session["role_list"] = json.dumps([], sort_keys=True, ensure_ascii=False, indent=2)
-	return render_template('index.html', form=form)
+	return render_template('index.html', form=form, error=json.dumps(""))
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -59,7 +59,7 @@ def login():
 					LOG(str(role.id) + "@" + str(role.act_id))
 					if r["whole_id"] == (str(role.id) + "@" + str(role.act_id)):
 						LOG(rolename + "@" + actname + " has already entered.")
-						return render_template('index.html', form=form)
+						return render_template('index.html', form=form, error=json.dumps(""))
 			else:
 				rolelist = []
 
@@ -70,7 +70,7 @@ def login():
 			session["role_list"] = json.dumps(rolelist, sort_keys=True, ensure_ascii=False, indent=2)
 			LOG("rolelist1= " + session["role_list"])
 			LOG(rolename + "@" + actname + " entered.")
-			return render_template('index.html', form=form)
+			return render_template('index.html', form=form, error=json.dumps(""))
 		else:
 			error = rolename + "@" + actname + " NOT exist."
 			LOG(rolename + "@" + actname + ":" + key + " NOT exist.")
@@ -109,7 +109,7 @@ def logout():
 				session["role_list"] = json.dumps(rolelist, sort_keys=True, ensure_ascii=False, indent=2)
 				LOG("rolelist3= " + session["role_list"])
 				LOG(rolename + "@" + actname + " exited.")
-				return render_template('index.html', form=form)
+				return render_template('index.html', form=form, error=json.dumps(""))
 
 		rolelist = list_up_role(currole, rolelist)
 		error = rolename + "@" + actname + " NOT login."
