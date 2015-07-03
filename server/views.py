@@ -53,7 +53,6 @@ def login():
 		if role:
 			if rolelist:
 				for r in rolelist:
-					#r = json.loads(r, "utf-8")
 					LOG("whole_id= " + r["whole_id"])
 					LOG(rolename + "@" + actname)
 					LOG(str(role.id) + "@" + str(role.act_id))
