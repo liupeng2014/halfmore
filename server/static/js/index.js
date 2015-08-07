@@ -75,29 +75,48 @@ function clickRoleSet (role_whole_id) {
 	document.getElementById("create").innerHTML = create_act;
 }
 
+function getRoleFromList (role_whole_id) {
+	for (var i = 0; i < role_list.length; i++) {
+		var role = role_list[i];
+		if (role_whole_id == role["whole_id"]) {
+			return role;	
+		}
+	}
+	return null;
+}
+
 function clickDivRole (divObj) {
 	clickRoleUp(divObj.id);
 }
 
-function clickBtnExit (role_name, act_name, whole_id) {
+function clickBtnExit (whole_id) {
 	var form_name = "frm_exit";
 	var form = document.forms[form_name];
+	var role = getRoleFromList(whole_id);
 
-	setHidden("hdn_rol", role_name, form_name);
-	setHidden("hdn_act", act_name, form_name);
+	if (role) {
+		return;
+	}
+
+	setHidden("hdn_rol", role["name"], form_name);
+	setHidden("hdn_act", role["act_name"], form_name);
 	setHidden("hdn_cur", whole_id, form_name);
 	form.method = "post";
 	form.submit();
 }
 
-function clickBtnSet (btnObj) {
-	alert(btnObj.id);
+function clickBtnSet (whole_id) {
+	var role = getRoleFromList(whole_id);
+
+	if (role) {
+		return;
+	}
 }
 
 function writeRoleCell (role, left, top) {
   var role_html = "<div id='" + role["whole_id"] + "' class='role' style='left:" + left + ";top:" + top + "' onclick='clickDivRole(this)'>" + role["whole_name"]
-				+   "<input type='button' value='Exit' id='" + role["whole_id"] + "' onclick='clickBtnExit(\"" + role["name"] + "\",\"" + role["act_name"] + "\",\"" + role["whole_id"] + "\")'></td>"
-				+   "<input type='button' value='Set' id='" + role["whole_id"] + "' onclick='clickBtnSet(this)'></td>"
+				+   "<input type='button' value='Exit' id='" + role["whole_id"] + "' onclick='clickBtnExit(\"" + role["whole_id"] + "\")'></td>"
+				+   "<input type='button' value='Set' id='" + role["whole_id"] + "' onclick='clickBtnSet(\"" + role["whole_id"] + "\")'></td>"
 				+ "</div>";
   return role_html;
 }
