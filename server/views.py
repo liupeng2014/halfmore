@@ -7,9 +7,12 @@ import json
 import threading
 import logging
 from flask import Flask, session, render_template, redirect, url_for, request, jsonify, abort, flash
+from flask.ext.socketio import SocketIO, emit
 
 from server import app, forms, logger
 from server import dbhandler as dbh
+
+socketio = SocketIO(app)
 
 def checkSession():
 	if session.get('operation') is not None:
@@ -63,6 +66,7 @@ def login():
 				rolelist = []
 
 			role_dict = role.serialize;
+			role_dict["act_name"] = actname
 			role_dict["whole_id"] = str(role.id) + "@" + str(role.act_id)
 			role_dict["whole_name"] = rolename + "@" + actname
 			rolelist.append(role_dict)
@@ -116,6 +120,10 @@ def logout():
 		return render_template('index.html', form=form, error=json.dumps(error))
 
 	return redirect(url_for('index'))
+
+@socketio.on('get_chat', namespace='/chat')
+def get_chat(chat):
+	emit('chat_message', {'data': 'test chat'})
 
 @app.route('/homepage')
 def homepage():
