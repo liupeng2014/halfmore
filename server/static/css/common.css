@@ -1,4 +1,4 @@
-#grey{
+#div_grey{
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -9,7 +9,7 @@
 	display: none;
 	z-index: 8;
 }
-#bg{
+#div_bg{
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -18,7 +18,7 @@
 	background-color: #00FF00;
 	z-index: 1;
 }
-#navi{
+#div_navi{
 	position: fixed;
 	top: 0px;
 	width: 1000px;
@@ -27,7 +27,7 @@
 	text-align: right;
 	z-index: 10;
 }
-#message{
+#div_message{
 	position: fixed;
 	top: 30px;
 	width: 1000px;
@@ -37,7 +37,7 @@
 	z-index: 10;
 	display: none;
 }
-#close{
+#div_close{
 	position: fixed;
 	top: 30px;
 	width: 50px;
@@ -47,7 +47,7 @@
 	z-index: 11;
 	display: none;
 }
-#create{
+#div_create{
 	position: fixed;
 	top: 30px;
 	width: 1000px;
@@ -56,7 +56,7 @@
 	display: none;
 	z-index: 9;
 }
-#profile{
+#div_profile{
 	position: fixed;
 	top: 30px;
 	width: 200px;
@@ -64,7 +64,7 @@
 	background-color: #00FFFF;
 	z-index: 2;
 }
-#rolelist{
+#div_rolelist{
 	position: fixed;
 	top: 380px;
 	width: 200px;
@@ -72,14 +72,14 @@
 	background-color: #007777;
 	z-index: 2;
 }
-#main{
+#div_main{
 	position: absolute;
 	top: 30px;
 	width: 600px;
 	height: 100%;
 	z-index: 2;
 }
-#right{
+#div_right{
 	position: fixed;
 	top: 30px;
 	width: 200px;
