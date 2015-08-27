@@ -121,6 +121,34 @@ def logout():
 
 	return redirect(url_for('index'))
 
+@app.route('/create', methods = ['POST'])
+def login():
+	form = forms.CreateForm()
+	if request.method == 'POST':
+		newtype = form.hdn_type.data
+
+		if (newtype == "act"):
+			actname = form.hdn_act.data
+			act = dbh.get_act_by_name(actname)
+			if (act is None):
+				act = dbh.add_act(name=actname)
+				if (act is None):
+					LOG("Add new act(" + actname + ") failed.")
+					error = actname + " create failed."
+					return render_template('index.html', form=form, op="add_act_ng", error=json.dumps(error))
+				else
+					session["new_act"] = json.dumps(act, sort_keys=True, ensure_ascii=False, indent=2)
+					LOG("Add new act(" + actname + ") successed.")
+					return render_template('index.html', form=form, op="add_act_ok")
+			else:
+				LOG("act(" + actname + ") existed.")
+				return render_template('index.html', form=form, op="add_act_dup")
+		elif (newtype == "role"):
+		else:
+			LOG(newtype + "is not supported.")
+
+	return redirect(url_for('index'))
+
 @socketio.on('get_chat', namespace='/chat')
 def get_chat(chat):
 	emit('chat_message', {'data': 'test chat'})

@@ -38,8 +38,8 @@ class LoginForm(Form):
 		return True		
 
 class CreateForm(Form):
-	hdn_act_new = HiddenField('hdn_act_new')
-	hdn_new_type = HiddenField('hdn_new_type')
+	hdn_act = HiddenField('hdn_act_new')
+	hdn_type = HiddenField('hdn_new_type')
 
 	def validate(self):
 		if not self.act.data:

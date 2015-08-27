@@ -310,9 +310,8 @@ function clickCreateNewAct () {
 		+	"</tr>"
 		+ "</table>";
 
-	document.getElementById("div_create").style.display = "block";
 	document.getElementById("div_create").innerHTML = create_act;
-//	document.getElementById("div_create").style.display = "block";
+	document.getElementById("div_create").style.display = "block";
 }
 
 function clickCreateNewRole () {
